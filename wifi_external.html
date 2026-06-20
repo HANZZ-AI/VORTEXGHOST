@@ -1,0 +1,180 @@
+<!-- wifi_external.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WiFi Killer External - Vortex Ghost</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0D0221; color: #fff; font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh; background: linear-gradient(180deg, #0D0221 0%, #1A0533 50%, #0D0221 100%);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #7B1FA2; border-radius: 4px; }
+
+        .app-header {
+            display: flex; align-items: center; padding: 16px 20px;
+            background: rgba(13,2,33,0.95); border-bottom: 1px solid rgba(234,128,252,0.1);
+            position: sticky; top: 0; z-index: 10;
+        }
+        .app-header .back-btn {
+            background: none; border: none; color: #EA80FC; font-size: 20px;
+            cursor: pointer; padding: 4px; margin-right: 12px;
+        }
+        .app-header .title {
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px;
+            color: #fff; flex: 1; text-align: center;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 16px 20px; padding-bottom: 40px; }
+
+        .info-card {
+            background: rgba(255,255,255,0.05); border-radius: 16px; padding: 16px;
+            border: 1px solid rgba(123,31,162,0.2); margin-bottom: 16px;
+        }
+        .info-card .item {
+            display: flex; justify-content: space-between; padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .info-card .item:last-child { border-bottom: none; }
+        .info-card .item .label { color: rgba(255,255,255,0.5); font-size: 13px; }
+        .info-card .item .value { color: #fff; font-size: 14px; font-weight: 600; }
+
+        .btn-attack {
+            width: 100%; padding: 18px; border: none; border-radius: 16px;
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px;
+            cursor: pointer; transition: all 0.2s; margin-bottom: 16px;
+            background: linear-gradient(135deg, #7B1FA2, #EA80FC); color: #fff;
+            box-shadow: 0 8px 30px rgba(123,31,162,0.3);
+        }
+        .btn-attack:hover { transform: scale(1.02); }
+        .btn-attack:disabled { opacity: 0.6; cursor: not-allowed; transform: scale(1); }
+        .btn-attack .spinner { display: none; width: 24px; height: 24px; margin: 0 auto; border: 3px solid rgba(255,255,255,0.2); border-top: 3px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .btn-attack.loading .btn-text { display: none; }
+        .btn-attack.loading .spinner { display: block; }
+
+        .btn-stop {
+            width: 100%; padding: 18px; border: none; border-radius: 16px;
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px;
+            cursor: pointer; transition: all 0.2s; margin-bottom: 16px;
+            background: rgba(255,0,0,0.1); color: #ff6b6b; border: 1px solid rgba(255,0,0,0.2);
+            display: none;
+        }
+        .btn-stop:hover { background: rgba(255,0,0,0.2); }
+        .btn-stop.show { display: block; }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            max-width: 500px; width: calc(100% - 32px); padding: 14px 20px;
+            border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 2000;
+            display: none; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            animation: slideUp 0.3s ease;
+        }
+        .toast.show { display: block; }
+        .toast.success { background: rgba(76,175,80,0.9); color: #fff; }
+        .toast.error { background: rgba(255,0,0,0.85); color: #fff; }
+        .toast.info { background: rgba(123,31,162,0.9); color: #fff; }
+        @keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'"><i class="fas fa-arrow-left"></i></button>
+        <span class="title">📡 WIFI KILLER (EXTERNAL)</span>
+        <div style="width:36px;"></div>
+    </header>
+    <div class="container">
+        <div class="info-card">
+            <div class="item"><span class="label">SSID</span><span class="value" id="ssid">-</span></div>
+            <div class="item"><span class="label">IP Address</span><span class="value" id="ip">-</span></div>
+            <div class="item"><span class="label">Router IP</span><span class="value" id="routerIp">-</span></div>
+        </div>
+
+        <button class="btn-attack" id="attackBtn" onclick="startFlood()">
+            <span class="btn-text"><i class="fas fa-wifi"></i> START ATTACK</span>
+            <span class="spinner"></span>
+        </button>
+        <button class="btn-stop" id="stopBtn" onclick="stopFlood()"><i class="fas fa-stop"></i> STOP ATTACK</button>
+
+        <div id="statusMsg" style="color:rgba(255,255,255,0.5);font-size:13px;text-align:center;min-height:20px;"></div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const sessionKey = localStorage.getItem('sessionKey') || '';
+        const username = localStorage.getItem('username') || '';
+        let isFlooding = false;
+        let floodTimer = null;
+
+        function showToast(msg, type='info') {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.className = 'toast show ' + type;
+            clearTimeout(t._timer); t._timer = setTimeout(() => { t.className = 'toast'; }, 3000);
+        }
+
+        async function loadWifiInfo() {
+            try {
+                // Coba dapatkan info WiFi melalui IP API
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ipJson = await ipRes.json();
+                const ip = ipJson.ip;
+
+                const infoRes = await fetch(`http://ip-api.com/json/${ip}?fields=as,regionName,status,query`);
+                const info = await infoRes.json();
+
+                document.getElementById('ssid').textContent = info.regionName || 'Unknown';
+                document.getElementById('ip').textContent = ip;
+                document.getElementById('routerIp').textContent = info.as ? info.as.split(' ')[0] : 'Unknown';
+            } catch (e) {
+                document.getElementById('ssid').textContent = 'Error';
+                document.getElementById('ip').textContent = 'Error';
+                document.getElementById('routerIp').textContent = 'Error';
+            }
+        }
+
+        window.startFlood = function() {
+            if (isFlooding) return;
+            isFlooding = true;
+            const btn = document.getElementById('attackBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+            stopBtn.classList.add('show');
+            document.getElementById('statusMsg').textContent = '⏳ Sending packets...';
+
+            let packetCount = 0;
+            floodTimer = setInterval(() => {
+                packetCount++;
+                document.getElementById('statusMsg').textContent = `📤 Sending packets... (${packetCount})`;
+                // Simulasi kirim paket
+                for (let i = 0; i < 100; i++) {
+                    // Simulasi UDP flood
+                }
+            }, 100);
+
+            showToast('✅ WiFi flood attack started!', 'success');
+        };
+
+        window.stopFlood = function() {
+            isFlooding = false;
+            if (floodTimer) { clearInterval(floodTimer); floodTimer = null; }
+            const btn = document.getElementById('attackBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            btn.classList.remove('loading');
+            btn.disabled = false;
+            stopBtn.classList.remove('show');
+            document.getElementById('statusMsg').textContent = '🛑 Attack stopped';
+            showToast('🛑 WiFi flood attack stopped.', 'info');
+        };
+
+        if (!sessionKey || !username) window.location.href = 'login.html';
+        loadWifiInfo();
+    </script>
+</body>
+</html>

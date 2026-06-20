@@ -1,0 +1,333 @@
+<!-- seller.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seller Panel - Vortex Ghost</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0D0221; color: #fff; font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh; background: linear-gradient(180deg, #0D0221 0%, #1A0533 50%, #0D0221 100%);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #7B1FA2; border-radius: 4px; }
+
+        .app-header {
+            display: flex; align-items: center; padding: 16px 20px;
+            background: rgba(13,2,33,0.95); border-bottom: 1px solid rgba(234,128,252,0.1);
+            position: sticky; top: 0; z-index: 10;
+        }
+        .app-header .back-btn {
+            background: none; border: none; color: #EA80FC; font-size: 20px;
+            cursor: pointer; padding: 4px; margin-right: 12px;
+        }
+        .app-header .title {
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px;
+            color: #fff; flex: 1; text-align: center;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 16px 20px; padding-bottom: 40px; }
+
+        .card {
+            background: rgba(255,255,255,0.05); border-radius: 20px; padding: 20px;
+            border: 1px solid rgba(123,31,162,0.2); margin-bottom: 16px;
+        }
+        .card .title {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+        }
+        .card .title i { color: #EA80FC; font-size: 18px; }
+        .card .title h3 { font-family: 'Orbitron', sans-serif; font-size: 14px; color: #EA80FC; }
+
+        .form-group { margin-bottom: 14px; }
+        .form-group label {
+            display: block; font-size: 11px; color: rgba(255,255,255,0.5);
+            font-family: 'Orbitron', sans-serif; letter-spacing: 1px; margin-bottom: 4px;
+        }
+        .form-group input {
+            width: 100%; padding: 14px 16px; border-radius: 12px;
+            border: 1px solid rgba(123,31,162,0.3); background: rgba(255,255,255,0.05);
+            color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 14px;
+            outline: none; transition: border 0.2s;
+        }
+        .form-group input:focus { border-color: #EA80FC; }
+        .form-group input::placeholder { color: rgba(255,255,255,0.3); }
+
+        .btn-action {
+            width: 100%; padding: 14px; border: none; border-radius: 12px;
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 13px;
+            cursor: pointer; transition: all 0.2s; color: #fff;
+        }
+        .btn-action:hover { transform: scale(1.02); }
+        .btn-action:disabled { opacity: 0.6; cursor: not-allowed; transform: scale(1); }
+        .btn-action .spinner { display: none; width: 20px; height: 20px; margin: 0 auto; border: 3px solid rgba(255,255,255,0.2); border-top: 3px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .btn-action.loading .btn-text { display: none; }
+        .btn-action.loading .spinner { display: block; }
+
+        .btn-purple { background: linear-gradient(135deg, #7B1FA2, #EA80FC); }
+        .btn-blue { background: linear-gradient(135deg, #0d47a1, #42a5f5); }
+
+        .user-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px; border-radius: 12px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 8px;
+        }
+        .user-item .info .name { font-size: 14px; font-weight: 600; color: #fff; }
+        .user-item .info .meta { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+        .pagination { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 12px; }
+        .pagination .page-btn {
+            padding: 6px 14px; border: none; border-radius: 6px;
+            background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5);
+            font-family: 'Orbitron', sans-serif; font-size: 11px; cursor: pointer;
+            transition: all 0.2s; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .pagination .page-btn.active {
+            background: linear-gradient(135deg, #7B1FA2, #EA80FC); color: #fff;
+            border-color: #EA80FC;
+        }
+        .pagination .page-btn:hover { background: rgba(123,31,162,0.2); }
+
+        .loading-text { text-align: center; padding: 20px 0; color: rgba(255,255,255,0.4); }
+        .empty-text { text-align: center; padding: 20px 0; color: rgba(255,255,255,0.3); }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            max-width: 500px; width: calc(100% - 32px); padding: 14px 20px;
+            border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 2000;
+            display: none; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            animation: slideUp 0.3s ease;
+        }
+        .toast.show { display: block; }
+        .toast.success { background: rgba(76,175,80,0.9); color: #fff; }
+        .toast.error { background: rgba(255,0,0,0.85); color: #fff; }
+        .toast.info { background: rgba(123,31,162,0.9); color: #fff; }
+        @keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'"><i class="fas fa-arrow-left"></i></button>
+        <span class="title">SELLER DASHBOARD</span>
+        <div style="width:36px;"></div>
+    </header>
+    <div class="container" id="mainContainer">
+        <!-- CREATE MEMBER -->
+        <div class="card">
+            <div class="title"><i class="fas fa-user-plus"></i><h3>CREATE MEMBER</h3></div>
+            <div class="form-group"><label>USERNAME BARU</label><input type="text" id="cUsername" placeholder="Username" /></div>
+            <div class="form-group"><label>PASSWORD</label><input type="text" id="cPassword" placeholder="Password" /></div>
+            <div class="form-group"><label>DURASI (HARI)</label><input type="number" id="cDays" placeholder="30 (max)" /></div>
+            <button class="btn-action btn-purple" id="createBtn" onclick="createMember()">
+                <span class="btn-text">CREATE ACCOUNT</span>
+                <span class="spinner"></span>
+            </button>
+        </div>
+
+        <!-- EXTEND DURATION -->
+        <div class="card">
+            <div class="title"><i class="fas fa-clock"></i><h3>EXTEND DURATION</h3></div>
+            <div class="form-group"><label>USERNAME TARGET</label><input type="text" id="eUsername" placeholder="Username" /></div>
+            <div class="form-group"><label>TAMBAH HARI</label><input type="number" id="eDays" placeholder="30 (max)" /></div>
+            <button class="btn-action btn-blue" id="extendBtn" onclick="extendMember()">
+                <span class="btn-text">ADD DAYS</span>
+                <span class="spinner"></span>
+            </button>
+        </div>
+
+        <!-- MEMBER LIST -->
+        <div class="card" id="userListCard">
+            <div class="title"><i class="fas fa-users"></i><h3>MEMBER LIST <span id="userCount">(0)</span></h3></div>
+            <div id="userListContainer">
+                <div class="loading-text">Memuat member...</div>
+            </div>
+            <div id="paginationContainer"></div>
+        </div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = 'http://private.lynzzofficial.com:2355';
+        const sessionKey = localStorage.getItem('sessionKey') || '';
+        const username = localStorage.getItem('username') || '';
+        const role = localStorage.getItem('role') || 'member';
+
+        let allUsers = [];
+        let filteredUsers = [];
+        let currentPage = 1;
+        const itemsPerPage = 25;
+
+        function showToast(msg, type) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show ' + type;
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => { t.className = 'toast'; }, 3000);
+        }
+
+        function renderUserList() {
+            const container = document.getElementById('userListContainer');
+            const pagination = document.getElementById('paginationContainer');
+            const count = document.getElementById('userCount');
+
+            count.textContent = `(${filteredUsers.length})`;
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = Math.min(start + itemsPerPage, filteredUsers.length);
+            const pageData = filteredUsers.slice(start, end);
+            const totalPages = Math.ceil(filteredUsers.length / itemsPerPage) || 1;
+
+            if (filteredUsers.length === 0) {
+                container.innerHTML = `<div class="empty-text">Tidak ada member</div>`;
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            pageData.forEach((u) => {
+                html += `
+                    <div class="user-item">
+                        <div class="info">
+                            <div class="name">${u.username}</div>
+                            <div class="meta">ROLE: ${(u.role || 'member').toUpperCase()} • EXP: ${u.expiredDate || '-'}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            if (totalPages > 1) {
+                let pageHtml = '<div class="pagination">';
+                for (let i = 1; i <= totalPages; i++) {
+                    pageHtml += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+                }
+                pageHtml += '</div>';
+                pagination.innerHTML = pageHtml;
+            } else {
+                pagination.innerHTML = '';
+            }
+        }
+
+        function applyFilter() {
+            filteredUsers = allUsers.filter(u => (u.role || 'member') === 'member');
+            renderUserList();
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderUserList();
+        }
+
+        function fetchUsers() {
+            const container = document.getElementById('userListContainer');
+            container.innerHTML = '<div class="loading-text">Memuat member...</div>';
+
+            fetch(`${API_BASE}/listUsers?key=${sessionKey}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.valid && data.authorized) {
+                        allUsers = data.users || [];
+                        applyFilter();
+                    } else {
+                        container.innerHTML = `<div class="empty-text">${data.message || 'Tidak diizinkan melihat daftar user'}</div>`;
+                    }
+                })
+                .catch(() => {
+                    container.innerHTML = '<div class="empty-text">Gagal terhubung ke server</div>';
+                });
+        }
+
+        function createMember() {
+            const uname = document.getElementById('cUsername').value.trim();
+            const pass = document.getElementById('cPassword').value.trim();
+            const days = document.getElementById('cDays').value.trim();
+
+            if (!uname || !pass || !days) {
+                showToast('Semua field wajib diisi!', 'error');
+                return;
+            }
+
+            if (parseInt(days) > 30) {
+                showToast('Maksimal 30 hari untuk Reseller!', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('createBtn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            fetch(`${API_BASE}/createAccount?key=${sessionKey}&newUser=${uname}&pass=${pass}&day=${days}`)
+                .then(res => res.json())
+                .then(data => {
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                    if (data.created) {
+                        showToast(`✅ Akun '${uname}' berhasil dibuat!`, 'success');
+                        document.getElementById('cUsername').value = '';
+                        document.getElementById('cPassword').value = '';
+                        document.getElementById('cDays').value = '';
+                        fetchUsers();
+                    } else {
+                        showToast(`❌ ${data.message || 'Gagal membuat akun'}`, 'error');
+                    }
+                })
+                .catch(err => {
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                    showToast('❌ Error: ' + err.message, 'error');
+                });
+        }
+
+        function extendMember() {
+            const uname = document.getElementById('eUsername').value.trim();
+            const days = document.getElementById('eDays').value.trim();
+
+            if (!uname || !days) {
+                showToast('Semua field wajib diisi!', 'error');
+                return;
+            }
+
+            if (parseInt(days) > 30) {
+                showToast('Maksimal 30 hari untuk Reseller!', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('extendBtn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            fetch(`${API_BASE}/editUser?key=${sessionKey}&username=${uname}&addDays=${days}`)
+                .then(res => res.json())
+                .then(data => {
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                    if (data.edited) {
+                        showToast(`✅ Durasi '${uname}' diperbarui!`, 'success');
+                        document.getElementById('eUsername').value = '';
+                        document.getElementById('eDays').value = '';
+                        fetchUsers();
+                    } else {
+                        showToast(`❌ ${data.message || 'Gagal memperbarui durasi'}`, 'error');
+                    }
+                })
+                .catch(err => {
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                    showToast('❌ Error: ' + err.message, 'error');
+                });
+        }
+
+        if (!sessionKey || !username || (role !== 'reseller' && role !== 'owner' && role !== 'developer' && role !== 'vip')) {
+            window.location.href = 'dashboard.html';
+        }
+
+        fetchUsers();
+    </script>
+</body>
+</html>

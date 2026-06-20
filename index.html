@@ -1,0 +1,179 @@
+<!-- index.html - Landing Page -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Vortex Ghost</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0D0221;
+            color: #fff;
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #0D0221 0%, #7B1FA2 40%, #0D0221 100%);
+        }
+        .container {
+            max-width: 420px;
+            width: 100%;
+            padding: 24px;
+            text-align: center;
+        }
+        .avatar {
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        .avatar img {
+            width: 100%;
+            display: block;
+        }
+        .avatar .overlay-text {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            pointer-events: none;
+        }
+        .avatar .overlay-text h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 34px;
+            background: linear-gradient(90deg, #EA80FC, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: none;
+            letter-spacing: 1px;
+        }
+        .avatar .overlay-text p {
+            color: rgba(255,255,255,0.8);
+            font-size: 12px;
+            margin-top: 4px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #7B1FA2, #EA80FC);
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(123, 31, 162, 0.4);
+            transition: transform 0.2s;
+            margin-bottom: 12px;
+        }
+        .btn-primary:hover {
+            transform: scale(1.02);
+        }
+        .btn-outline {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid rgba(123, 31, 162, 0.5);
+            border-radius: 16px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.05);
+            color: #EA80FC;
+            transition: background 0.2s;
+            margin-bottom: 24px;
+        }
+        .btn-outline:hover {
+            background: rgba(123, 31, 162, 0.2);
+        }
+        .social-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        .social-row a {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .social-row a:hover {
+            background: rgba(123, 31, 162, 0.2);
+        }
+        .social-row .telegram { color: #0088cc; }
+        .social-row .whatsapp { color: #25D366; }
+        .footer {
+            font-size: 11px;
+            color: rgba(255,255,255,0.3);
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Avatar dengan teks overlay -->
+        <div class="avatar">
+            <img src="src/assets/img/reze.png" alt="Vortex Ghost" />
+            <div class="overlay-text">
+                <h1>Vortex Ghost</h1>
+                <p>This Is the End</p>
+            </div>
+        </div>
+
+        <!-- Tombol Login -->
+        <button class="btn-primary" onclick="window.location.href='login.html'">
+            <i class="fas fa-sign-in-alt"></i>&nbsp; Log In
+        </button>
+
+        <!-- Tombol Buy Access -->
+        <button class="btn-outline" onclick="window.open('https://t.me/HANZZXBUG','_blank')">
+            <i class="fas fa-shopping-bag"></i>&nbsp; Buy Access
+        </button>
+
+        <!-- Social Row -->
+        <div class="social-row">
+            <a href="https://t.me/vortexghostofc" target="_blank" class="telegram">
+                <i class="fab fa-telegram-plane"></i> Telegram
+            </a>
+            <a href="https://whatsapp.com/channel/0029Vb8FmCpGE56t02wzPR23" target="_blank" class="whatsapp">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+        </div>
+
+        <div class="footer">© Present by HANZZ</div>
+    </div>
+
+    <script>
+        // Cek apakah sudah login, redirect ke dashboard
+        (function() {
+            const session = localStorage.getItem('sessionKey');
+            const username = localStorage.getItem('username');
+            if (session && username) {
+                // Coba validasi ke server
+                fetch(`http://private.lynzzofficial.com:2355/myInfo?username=${username}&password=${localStorage.getItem('password')}&androidId=${localStorage.getItem('androidId') || 'web'}&key=${session}`)
+            }
+        })();
+    </script>
+</body>
+</html>

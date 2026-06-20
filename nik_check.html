@@ -1,0 +1,226 @@
+<!-- nik_check.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NIK Check - Vortex Ghost</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0D0221; color: #fff; font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh; background: linear-gradient(180deg, #0D0221 0%, #1A0533 50%, #0D0221 100%);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #7B1FA2; border-radius: 4px; }
+
+        .app-header {
+            display: flex; align-items: center; padding: 16px 20px;
+            background: rgba(13,2,33,0.95); border-bottom: 1px solid rgba(234,128,252,0.1);
+            position: sticky; top: 0; z-index: 10;
+        }
+        .app-header .back-btn {
+            background: none; border: none; color: #EA80FC; font-size: 20px;
+            cursor: pointer; padding: 4px; margin-right: 12px;
+        }
+        .app-header .title {
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px;
+            color: #fff; flex: 1; text-align: center;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 16px 20px; padding-bottom: 40px; }
+
+        .input-section {
+            background: rgba(255,255,255,0.05); border-radius: 20px; padding: 20px;
+            border: 1px solid rgba(123,31,162,0.2); margin-bottom: 16px;
+        }
+        .input-section .header {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+        }
+        .input-section .header i { color: #EA80FC; font-size: 18px; }
+        .input-section .header h3 { font-family: 'Orbitron', sans-serif; font-size: 14px; color: #EA80FC; }
+        .input-section .input-wrap { display: flex; gap: 10px; }
+        .input-section .input-wrap input {
+            flex: 1; padding: 14px 16px; border-radius: 12px;
+            border: 1px solid rgba(123,31,162,0.3); background: rgba(255,255,255,0.05);
+            color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 14px;
+            outline: none; transition: border 0.2s; letter-spacing: 1px;
+        }
+        .input-section .input-wrap input:focus { border-color: #EA80FC; }
+        .input-section .input-wrap input::placeholder { color: rgba(255,255,255,0.3); }
+        .input-section .input-wrap button {
+            padding: 14px 24px; border: none; border-radius: 12px;
+            background: linear-gradient(135deg, #7B1FA2, #EA80FC); color: #fff;
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12px;
+            cursor: pointer; transition: all 0.2s; white-space: nowrap;
+        }
+        .input-section .input-wrap button:hover { transform: scale(1.02); }
+        .input-section .input-wrap button:disabled { opacity: 0.6; cursor: not-allowed; transform: scale(1); }
+
+        .result-section {
+            background: rgba(255,255,255,0.05); border-radius: 20px; padding: 20px;
+            border: 1px solid rgba(123,31,162,0.2); display: none;
+        }
+        .result-section.show { display: block; }
+
+        .result-section .cat {
+            margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;
+        }
+        .result-section .cat:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .result-section .cat .title {
+            font-family: 'Orbitron', sans-serif; font-size: 13px; color: #EA80FC;
+            margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+        }
+        .result-section .cat .title i { font-size: 14px; }
+        .result-item {
+            display: flex; justify-content: space-between; padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .result-item:last-child { border-bottom: none; }
+        .result-item .label { color: rgba(255,255,255,0.5); font-size: 13px; }
+        .result-item .value { color: #fff; font-size: 14px; font-weight: 500; }
+
+        .loading-state { text-align: center; padding: 40px 0; display: none; }
+        .loading-state.show { display: block; }
+        .loading-state .spinner {
+            width: 40px; height: 40px; margin: 0 auto 12px;
+            border: 3px solid rgba(234,128,252,0.2); border-top: 3px solid #EA80FC;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .error-state {
+            background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.3);
+            border-radius: 16px; padding: 16px; display: none; margin-bottom: 16px;
+        }
+        .error-state.show { display: block; }
+        .error-state .row { display: flex; align-items: center; gap: 12px; }
+        .error-state .row i { color: #ff6b6b; font-size: 20px; }
+        .error-state .row p { color: #ff6b6b; font-size: 14px; }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            max-width: 500px; width: calc(100% - 32px); padding: 14px 20px;
+            border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 2000;
+            display: none; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            animation: slideUp 0.3s ease;
+        }
+        .toast.show { display: block; }
+        .toast.success { background: rgba(76,175,80,0.9); color: #fff; }
+        .toast.error { background: rgba(255,0,0,0.85); color: #fff; }
+        .toast.info { background: rgba(123,31,162,0.9); color: #fff; }
+        @keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'"><i class="fas fa-arrow-left"></i></button>
+        <span class="title">NIK CHECK</span>
+        <div style="width:36px;"></div>
+    </header>
+    <div class="container">
+        <div class="input-section">
+            <div class="header"><i class="fas fa-id-card"></i><h3>MASUKKAN NIK</h3></div>
+            <div class="input-wrap">
+                <input type="text" id="nikInput" placeholder="5206085405880001" maxlength="16" />
+                <button id="checkBtn" onclick="checkNik()">CEK DATA</button>
+            </div>
+        </div>
+
+        <div class="loading-state" id="loadingState"><div class="spinner"></div><p>Mencari data NIK...</p></div>
+        <div class="error-state" id="errorState"><div class="row"><i class="fas fa-exclamation-circle"></i><p id="errorText">Error</p></div></div>
+
+        <div class="result-section" id="resultSection">
+            <div class="cat">
+                <div class="title"><i class="fas fa-user"></i> IDENTITAS DIRI</div>
+                <div class="result-item"><span class="label">NIK</span><span class="value" id="rNik">-</span></div>
+                <div class="result-item"><span class="label">Nama Lengkap</span><span class="value" id="rNama">-</span></div>
+                <div class="result-item"><span class="label">Jenis Kelamin</span><span class="value" id="rKelamin">-</span></div>
+                <div class="result-item"><span class="label">Tempat Lahir</span><span class="value" id="rTempatLahir">-</span></div>
+                <div class="result-item"><span class="label">Usia</span><span class="value" id="rUsia">-</span></div>
+            </div>
+            <div class="cat">
+                <div class="title"><i class="fas fa-location-dot"></i> DATA DOMISILI</div>
+                <div class="result-item"><span class="label">Provinsi</span><span class="value" id="rProvinsi">-</span></div>
+                <div class="result-item"><span class="label">Kabupaten/Kota</span><span class="value" id="rKabupaten">-</span></div>
+                <div class="result-item"><span class="label">Kecamatan</span><span class="value" id="rKecamatan">-</span></div>
+                <div class="result-item"><span class="label">Kelurahan/Desa</span><span class="value" id="rKelurahan">-</span></div>
+                <div class="result-item"><span class="label">Alamat</span><span class="value" id="rAlamat">-</span></div>
+            </div>
+            <div class="cat">
+                <div class="title"><i class="fas fa-info-circle"></i> INFORMASI TAMBAHAN</div>
+                <div class="result-item"><span class="label">Zodiak</span><span class="value" id="rZodiak">-</span></div>
+                <div class="result-item"><span class="label">Ultah Mendatang</span><span class="value" id="rUltah">-</span></div>
+                <div class="result-item"><span class="label">Pasaran</span><span class="value" id="rPasaran">-</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = 'https://api.siputzx.my.id/api/tools/nik-checker?nik=';
+        const sessionKey = localStorage.getItem('sessionKey') || '';
+        const username = localStorage.getItem('username') || '';
+
+        function showToast(msg, type='info') {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.className = 'toast show ' + type;
+            clearTimeout(t._timer); t._timer = setTimeout(() => { t.className = 'toast'; }, 3000);
+        }
+
+        function setLoading(loading) {
+            const btn = document.getElementById('checkBtn');
+            const loader = document.getElementById('loadingState');
+            if (loading) { loader.classList.add('show'); btn.disabled = true; btn.textContent = 'PROSES...'; }
+            else { loader.classList.remove('show'); btn.disabled = false; btn.textContent = 'CEK DATA'; }
+        }
+
+        window.checkNik = function() {
+            const nik = document.getElementById('nikInput').value.trim();
+            if (!nik || nik.length < 10) { showToast('Masukkan NIK yang valid (min 10 digit)!', 'error'); return; }
+            document.getElementById('errorState').classList.remove('show');
+            document.getElementById('resultSection').classList.remove('show');
+            setLoading(true);
+
+            fetch(API_BASE + encodeURIComponent(nik))
+                .then(res => res.json())
+                .then(data => {
+                    setLoading(false);
+                    if (data.status && data.data) {
+                        const d = data.data;
+                        document.getElementById('rNik').textContent = d.nik || '-';
+                        document.getElementById('rNama').textContent = d.nama || '-';
+                        document.getElementById('rKelamin').textContent = d.kelamin || '-';
+                        document.getElementById('rTempatLahir').textContent = d.tempat_lahir || '-';
+                        document.getElementById('rUsia').textContent = d.usia || '-';
+                        document.getElementById('rProvinsi').textContent = d.provinsi || '-';
+                        document.getElementById('rKabupaten').textContent = d.kabupaten || '-';
+                        document.getElementById('rKecamatan').textContent = d.kecamatan || '-';
+                        document.getElementById('rKelurahan').textContent = d.kelurahan || '-';
+                        document.getElementById('rAlamat').textContent = d.alamat || '-';
+                        document.getElementById('rZodiak').textContent = d.zodiak || '-';
+                        document.getElementById('rUltah').textContent = d.ultah_mendatang || '-';
+                        document.getElementById('rPasaran').textContent = d.pasaran || '-';
+                        document.getElementById('resultSection').classList.add('show');
+                        showToast('✅ Data NIK ditemukan!', 'success');
+                    } else {
+                        showError('Data tidak ditemukan atau NIK tidak valid');
+                    }
+                })
+                .catch(err => { setLoading(false); showError(err.message); });
+        };
+
+        function showError(msg) {
+            document.getElementById('errorText').textContent = msg;
+            document.getElementById('errorState').classList.add('show');
+            showToast('❌ ' + msg, 'error');
+        }
+
+        document.getElementById('nikInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') checkNik(); });
+        if (!sessionKey || !username) window.location.href = 'login.html';
+    </script>
+</body>
+</html>

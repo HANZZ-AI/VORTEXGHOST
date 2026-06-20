@@ -1,0 +1,314 @@
+<!-- contact.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact - Vortex Ghost</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0D0221;
+            color: #fff;
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0D0221 0%, #1A0533 50%, #0D0221 100%);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #7B1FA2;
+            border-radius: 4px;
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            background: transparent;
+        }
+        .app-header .back-btn {
+            background: none;
+            border: none;
+            color: #EA80FC;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            margin-right: 12px;
+        }
+        .app-header .title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: #fff;
+            flex: 1;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 30px;
+            padding-bottom: 40px;
+        }
+
+        /* Icon Header */
+        .icon-header {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .icon-header .circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(123, 31, 162, 0.2);
+            border: 2px solid rgba(234, 128, 252, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #EA80FC;
+            box-shadow: 0 0 40px rgba(123, 31, 162, 0.2);
+        }
+
+        .page-title {
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .page-subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            margin-top: 4px;
+            margin-bottom: 32px;
+        }
+
+        /* Contact Button */
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #fff;
+        }
+        .contact-btn:hover {
+            background: rgba(123, 31, 162, 0.15);
+            border-color: rgba(234, 128, 252, 0.3);
+            transform: translateY(-2px);
+        }
+        .contact-btn .left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .contact-btn .left .icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .contact-btn .left .info .label {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .contact-btn .left .info .sub {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .contact-btn .arrow {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+        }
+
+        /* Specific colors */
+        .contact-btn.telegram .icon-box {
+            color: #0088cc;
+            background: rgba(0, 136, 204, 0.1);
+        }
+        .contact-btn.whatsapp .icon-box {
+            color: #25D366;
+            background: rgba(37, 211, 102, 0.1);
+        }
+        .contact-btn.tiktok .icon-box {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 500px;
+            width: calc(100% - 32px);
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            animation: slideUp 0.3s ease;
+        }
+        .toast.show {
+            display: block;
+        }
+        .toast.success {
+            background: rgba(76, 175, 80, 0.9);
+            color: #fff;
+        }
+        .toast.error {
+            background: rgba(255, 0, 0, 0.85);
+            color: #fff;
+        }
+        .toast.info {
+            background: rgba(123, 31, 162, 0.9);
+            color: #fff;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="app-header">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <span class="title">Customer Service</span>
+        <div style="width:36px;"></div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="container" id="mainContainer">
+        <!-- Icon -->
+        <div class="icon-header">
+            <div class="circle">
+                <i class="fas fa-headset"></i>
+            </div>
+        </div>
+
+        <div class="page-title">Need Help?</div>
+        <div class="page-subtitle">Contact us through our social media platforms below.</div>
+
+        <!-- Contact Buttons -->
+        <a class="contact-btn telegram" href="https://t.me/HANZZXBUG" target="_blank">
+            <div class="left">
+                <div class="icon-box"><i class="fab fa-telegram-plane"></i></div>
+                <div class="info">
+                    <div class="label">Telegram</div>
+                    <div class="sub">@HANZZXBUG</div>
+                </div>
+            </div>
+            <div class="arrow"><i class="fas fa-chevron-right"></i></div>
+        </a>
+
+        <a class="contact-btn whatsapp" href="https://wa.me/6283196463931" target="_blank">
+            <div class="left">
+                <div class="icon-box"><i class="fab fa-whatsapp"></i></div>
+                <div class="info">
+                    <div class="label">WhatsApp</div>
+                    <div class="sub">+62 831-9646-3931</div>
+                </div>
+            </div>
+            <div class="arrow"><i class="fas fa-chevron-right"></i></div>
+        </a>
+
+        <a class="contact-btn tiktok" href="https://www.tiktok.com/@hanzzxbug" target="_blank">
+            <div class="left">
+                <div class="icon-box"><i class="fab fa-tiktok"></i></div>
+                <div class="info">
+                    <div class="label">TikTok</div>
+                    <div class="sub">@hanzzxbug</div>
+                </div>
+            </div>
+            <div class="arrow"><i class="fas fa-chevron-right"></i></div>
+        </a>
+
+        <!-- Instagram telah dihapus (sesuai contact_page.dart) -->
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============================================================
+        //  CONTACT - SAMA PERSIS DENGAN contact_page.dart
+        // ============================================================
+
+        (function() {
+            'use strict';
+
+            // === STATE ===
+            const sessionKey = localStorage.getItem('sessionKey') || '';
+            const username = localStorage.getItem('username') || '';
+
+            // === DOM REFS ===
+            const toast = document.getElementById('toast');
+
+            // === HELPERS ===
+            function showToast(msg, type = 'info') {
+                toast.textContent = msg;
+                toast.className = 'toast show ' + type;
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => {
+                    toast.className = 'toast';
+                }, 3000);
+            }
+
+            // === INIT ===
+            function init() {
+                // Cek session
+                if (!sessionKey || !username) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Semua link sudah menggunakan href langsung dengan target="_blank"
+                // Tidak perlu JavaScript tambahan
+            }
+
+            init();
+
+        })();
+    </script>
+
+</body>
+</html>

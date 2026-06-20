@@ -1,0 +1,239 @@
+<!-- splash.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Splash - Vortex Ghost</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #000;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .video-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .video-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+            background: rgba(0,0,0,0.1);
+        }
+        .skip-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            border: 1px solid rgba(234, 128, 252, 0.5);
+            border-radius: 20px;
+            padding: 8px 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+            pointer-events: all;
+        }
+        .skip-btn:hover {
+            background: rgba(123, 31, 162, 0.4);
+        }
+        .skip-btn i {
+            color: #EA80FC;
+            font-size: 18px;
+        }
+        .brand-text {
+            position: fixed;
+            bottom: 80px;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            text-align: center;
+            pointer-events: none;
+        }
+        .brand-text h1 {
+            font-size: 42px;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 3px;
+            text-shadow: 
+                0 0 20px rgba(234, 128, 252, 0.8),
+                0 0 40px rgba(123, 31, 162, 0.6),
+                0 4px 20px rgba(0,0,0,0.8);
+        }
+        .fade-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            background: #000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+        .fade-overlay.active {
+            opacity: 1;
+        }
+        /* Loader jika video belum siap */
+        .loader {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            color: #EA80FC;
+            font-size: 14px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .loader .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 12px;
+            border: 3px solid rgba(234, 128, 252, 0.2);
+            border-top: 3px solid #EA80FC;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <span>Loading...</span>
+    </div>
+
+    <!-- Video Wrapper -->
+    <div class="video-wrapper">
+        <video id="splashVideo" muted playsinline preload="auto">
+            <source src="src/assets/vidios/splash.mp4" type="video/mp4" />
+        </video>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay"></div>
+
+    <!-- Skip Button -->
+    <button class="skip-btn" id="skipBtn">
+        <i class="fas fa-forward"></i> Skip
+    </button>
+
+    <!-- Brand Text -->
+    <div class="brand-text">
+        <h1>Vortex Ghost</h1>
+    </div>
+
+    <!-- Fade Overlay -->
+    <div class="fade-overlay" id="fadeOverlay"></div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <script>
+        (function() {
+            const video = document.getElementById('splashVideo');
+            const skipBtn = document.getElementById('skipBtn');
+            const fadeOverlay = document.getElementById('fadeOverlay');
+            const loader = document.getElementById('loader');
+            let isRedirecting = false;
+            let fadeOutStarted = false;
+
+            // === Navigasi ke Dashboard ===
+            function goToDashboard() {
+                if (isRedirecting) return;
+                isRedirecting = true;
+                window.location.href = 'dashboard.html';
+            }
+
+            // === Skip Button ===
+            skipBtn.addEventListener('click', function() {
+                if (!video.paused) {
+                    video.pause();
+                }
+                goToDashboard();
+            });
+
+            // === Video Loaded ===
+            video.addEventListener('loadedmetadata', function() {
+                loader.style.display = 'none';
+                // Coba play otomatis
+                video.play().catch(function(err) {
+                    // Autoplay mungkin diblokir, tapi tidak masalah
+                    console.log('Autoplay blocked, user must interact.');
+                });
+            });
+
+            // === Video Progress (untuk deteksi mendekati akhir) ===
+            video.addEventListener('timeupdate', function() {
+                const duration = video.duration;
+                const currentTime = video.currentTime;
+
+                if (duration && duration > 0) {
+                    // Jika video hampir selesai (kurang dari 1 detik)
+                    if (duration - currentTime < 1.0 && !fadeOutStarted) {
+                        fadeOutStarted = true;
+                        fadeOverlay.classList.add('active');
+                    }
+
+                    // Jika video selesai
+                    if (currentTime >= duration) {
+                        goToDashboard();
+                    }
+                }
+            });
+
+            // === Fallback jika video gagal load ===
+            video.addEventListener('error', function() {
+                loader.style.display = 'none';
+                // Redirect otomatis setelah 2 detik jika error
+                setTimeout(function() {
+                    goToDashboard();
+                }, 2000);
+            });
+
+            // === Jika video tidak bisa diputar sama sekali ===
+            setTimeout(function() {
+                if (video.readyState === 0) {
+                    loader.style.display = 'none';
+                    setTimeout(function() {
+                        goToDashboard();
+                    }, 3000);
+                }
+            }, 5000);
+
+        })();
+    </script>
+
+</body>
+</html>

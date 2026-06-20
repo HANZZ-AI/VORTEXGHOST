@@ -1,0 +1,522 @@
+<!-- country.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Country Info - Vortex Ghost</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0D0221; color: #fff; font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0D0221 0%, #1A0533 50%, #0D0221 100%);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #7B1FA2; border-radius: 4px; }
+
+        .app-header {
+            display: flex; align-items: center; padding: 16px 20px;
+            background: rgba(13,2,33,0.95); border-bottom: 1px solid rgba(234,128,252,0.1);
+            position: sticky; top: 0; z-index: 10;
+        }
+        .app-header .back-btn {
+            background: none; border: none; color: #EA80FC; font-size: 20px;
+            cursor: pointer; padding: 4px; margin-right: 12px;
+        }
+        .app-header .title {
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px;
+            color: #fff; flex: 1; text-align: center;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 16px 20px; padding-bottom: 40px; }
+
+        /* Input Section */
+        .input-section {
+            background: rgba(255,255,255,0.05); border-radius: 20px; padding: 20px;
+            border: 1px solid rgba(123,31,162,0.2); margin-bottom: 20px;
+        }
+        .input-section .header {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+        }
+        .input-section .header i { color: #EA80FC; font-size: 20px; }
+        .input-section .header h3 {
+            font-family: 'Orbitron', sans-serif; font-size: 14px; color: #EA80FC;
+        }
+        .input-section .input-wrap { display: flex; gap: 10px; }
+        .input-section .input-wrap input {
+            flex: 1; padding: 14px 16px; border-radius: 12px;
+            border: 1px solid rgba(123,31,162,0.3); background: rgba(255,255,255,0.05);
+            color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 14px;
+            outline: none; transition: border 0.2s;
+        }
+        .input-section .input-wrap input:focus { border-color: #EA80FC; }
+        .input-section .input-wrap input::placeholder { color: rgba(255,255,255,0.3); }
+        .input-section .input-wrap button {
+            padding: 14px 24px; border: none; border-radius: 12px;
+            background: linear-gradient(135deg, #7B1FA2, #EA80FC); color: #fff;
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12px;
+            cursor: pointer; transition: all 0.2s; white-space: nowrap;
+        }
+        .input-section .input-wrap button:hover { transform: scale(1.02); }
+        .input-section .input-wrap button:disabled { opacity: 0.6; cursor: not-allowed; transform: scale(1); }
+
+        /* Loading */
+        .loading-state { text-align: center; padding: 40px 0; display: none; }
+        .loading-state.show { display: block; }
+        .loading-state .spinner {
+            width: 40px; height: 40px; margin: 0 auto 12px;
+            border: 3px solid rgba(234,128,252,0.2); border-top: 3px solid #EA80FC;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        .loading-state p { color: rgba(255,255,255,0.5); font-size: 14px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Error */
+        .error-state {
+            background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.3);
+            border-radius: 16px; padding: 16px; display: none; margin-bottom: 16px;
+        }
+        .error-state.show { display: block; }
+        .error-state .row { display: flex; align-items: center; gap: 12px; }
+        .error-state .row i { color: #ff6b6b; font-size: 20px; }
+        .error-state .row p { color: #ff6b6b; font-size: 14px; }
+
+        /* Country Header */
+        .country-header {
+            background: rgba(255,255,255,0.05); border-radius: 20px; padding: 20px;
+            border: 1px solid rgba(123,31,162,0.2); margin-bottom: 16px;
+            display: none;
+        }
+        .country-header.show { display: block; }
+        .country-header .top {
+            display: flex; align-items: center; gap: 16px;
+        }
+        .country-header .top .flag {
+            width: 80px; height: 50px; border-radius: 10px;
+            overflow: hidden; background: rgba(255,255,255,0.05);
+            flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            font-size: 40px;
+        }
+        .country-header .top .flag img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .country-header .top .info h2 {
+            font-family: 'Orbitron', sans-serif; font-size: 20px; color: #fff;
+        }
+        .country-header .top .info .sub {
+            font-size: 13px; color: rgba(255,255,255,0.5);
+        }
+        .country-header .top .info .sub span { color: #EA80FC; }
+
+        /* Info Grid */
+        .info-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+            margin-bottom: 16px; display: none;
+        }
+        .info-grid.show { display: grid; }
+        .info-grid .item {
+            background: rgba(255,255,255,0.05); border-radius: 12px;
+            padding: 12px 14px; border: 1px solid rgba(255,255,255,0.06);
+        }
+        .info-grid .item .label {
+            font-size: 9px; color: rgba(255,255,255,0.4);
+            text-transform: uppercase; letter-spacing: 0.5px;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .info-grid .item .label i { color: #EA80FC; font-size: 10px; }
+        .info-grid .item .value {
+            font-size: 13px; font-weight: 700; color: #fff;
+            margin-top: 2px; font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Famous For */
+        .famous-box {
+            background: rgba(123,31,162,0.1); border: 1px solid rgba(123,31,162,0.2);
+            border-radius: 12px; padding: 12px 16px; margin-bottom: 16px;
+            display: none;
+        }
+        .famous-box.show { display: block; }
+        .famous-box .row {
+            display: flex; align-items: flex-start; gap: 10px;
+        }
+        .famous-box .row i { color: #EA80FC; font-size: 16px; margin-top: 2px; }
+        .famous-box .row p {
+            color: rgba(255,255,255,0.7); font-size: 13px; line-height: 1.5;
+        }
+
+        /* Neighbors */
+        .neighbors-section {
+            background: rgba(255,255,255,0.05); border-radius: 16px; padding: 16px;
+            border: 1px solid rgba(123,31,162,0.2); display: none;
+        }
+        .neighbors-section.show { display: block; }
+        .neighbors-section .header {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+        }
+        .neighbors-section .header i { color: #EA80FC; font-size: 18px; }
+        .neighbors-section .header h4 {
+            font-family: 'Orbitron', sans-serif; font-size: 14px; color: #EA80FC;
+        }
+        .neighbor-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px; background: rgba(255,255,255,0.03);
+            border-radius: 10px; margin-bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .neighbor-item:last-child { margin-bottom: 0; }
+        .neighbor-item .flag-sm {
+            width: 40px; height: 25px; border-radius: 4px;
+            overflow: hidden; background: rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+        }
+        .neighbor-item .flag-sm img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .neighbor-item .info .name {
+            font-size: 14px; font-weight: 600; color: #fff;
+        }
+        .neighbor-item .info .coords {
+            font-size: 10px; color: rgba(255,255,255,0.3);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            max-width: 500px; width: calc(100% - 32px); padding: 14px 20px;
+            border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 2000;
+            display: none; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            animation: slideUp 0.3s ease;
+        }
+        .toast.show { display: block; }
+        .toast.success { background: rgba(76,175,80,0.9); color: #fff; }
+        .toast.error { background: rgba(255,0,0,0.85); color: #fff; }
+        .toast.info { background: rgba(123,31,162,0.9); color: #fff; }
+        @keyframes slideUp {
+            from { opacity:0; transform:translateX(-50%) translateY(20px); }
+            to { opacity:1; transform:translateX(-50%) translateY(0); }
+        }
+
+        @media (max-width: 400px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .input-section .input-wrap { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="app-header">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <span class="title">COUNTRY INFO</span>
+        <div style="width:36px;"></div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="container" id="mainContainer">
+
+        <!-- Input Section -->
+        <div class="input-section">
+            <div class="header">
+                <i class="fas fa-globe"></i>
+                <h3>CEK INFORMASI NEGARA</h3>
+            </div>
+            <div class="input-wrap">
+                <input type="text" id="countryInput" placeholder="Masukkan nama negara..." />
+                <button id="checkBtn" onclick="checkCountry()">CEK NEGARA</button>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading-state" id="loadingState">
+            <div class="spinner"></div>
+            <p>Mencari informasi negara...</p>
+        </div>
+
+        <!-- Error -->
+        <div class="error-state" id="errorState">
+            <div class="row">
+                <i class="fas fa-exclamation-circle"></i>
+                <p id="errorText">Negara tidak ditemukan</p>
+            </div>
+        </div>
+
+        <!-- Country Header -->
+        <div class="country-header" id="countryHeader">
+            <div class="top">
+                <div class="flag" id="flagContainer">
+                    <i class="fas fa-flag"></i>
+                </div>
+                <div class="info">
+                    <h2 id="countryName">-</h2>
+                    <div class="sub">Ibukota: <span id="capitalText">-</span> &bull; <span id="continentText">-</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Grid -->
+        <div class="info-grid" id="infoGrid">
+            <div class="item">
+                <div class="label"><i class="fas fa-phone"></i> Kode Telepon</div>
+                <div class="value" id="phoneCode">-</div>
+            </div>
+            <div class="item">
+                <div class="label"><i class="fas fa-map"></i> Luas Wilayah</div>
+                <div class="value" id="area">-</div>
+            </div>
+            <div class="item">
+                <div class="label"><i class="fas fa-language"></i> Bahasa</div>
+                <div class="value" id="languages">-</div>
+            </div>
+            <div class="item">
+                <div class="label"><i class="fas fa-money-bill"></i> Mata Uang</div>
+                <div class="value" id="currency">-</div>
+            </div>
+            <div class="item">
+                <div class="label"><i class="fas fa-road"></i> Sisi Jalan</div>
+                <div class="value" id="drivingSide">-</div>
+            </div>
+            <div class="item">
+                <div class="label"><i class="fas fa-globe"></i> TLD</div>
+                <div class="value" id="tld">-</div>
+            </div>
+            <div class="item">
+                <div class="label"><i class="fas fa-location-dot"></i> Latitude</div>
+                <div class="value" id="latitude">-</div>
+            </div>
+            <div class="item">
+                <div class="label"><i class="fas fa-location-dot"></i> Longitude</div>
+                <div class="value" id="longitude">-</div>
+            </div>
+        </div>
+
+        <!-- Famous For -->
+        <div class="famous-box" id="famousBox">
+            <div class="row">
+                <i class="fas fa-star"></i>
+                <p id="famousText">-</p>
+            </div>
+        </div>
+
+        <!-- Neighbors -->
+        <div class="neighbors-section" id="neighborsSection">
+            <div class="header">
+                <i class="fas fa-flag"></i>
+                <h4>NEGARA TETANGGA</h4>
+            </div>
+            <div id="neighborsList"></div>
+        </div>
+
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============================================================
+        //  COUNTRY INFO - SAMA PERSIS DENGAN country_negara.dart
+        // ============================================================
+
+        (function() {
+            'use strict';
+
+            // === CONSTANTS ===
+            const API_URL = 'https://api.siputzx.my.id/api/tools/countryInfo?name=';
+
+            // === STATE ===
+            const sessionKey = localStorage.getItem('sessionKey') || '';
+            const username = localStorage.getItem('username') || '';
+            let isLoading = false;
+
+            // === DOM REFS ===
+            const countryInput = document.getElementById('countryInput');
+            const checkBtn = document.getElementById('checkBtn');
+            const loadingState = document.getElementById('loadingState');
+            const errorState = document.getElementById('errorState');
+            const errorText = document.getElementById('errorText');
+            const countryHeader = document.getElementById('countryHeader');
+            const flagContainer = document.getElementById('flagContainer');
+            const countryName = document.getElementById('countryName');
+            const capitalText = document.getElementById('capitalText');
+            const continentText = document.getElementById('continentText');
+            const infoGrid = document.getElementById('infoGrid');
+            const phoneCode = document.getElementById('phoneCode');
+            const area = document.getElementById('area');
+            const languages = document.getElementById('languages');
+            const currency = document.getElementById('currency');
+            const drivingSide = document.getElementById('drivingSide');
+            const tld = document.getElementById('tld');
+            const latitude = document.getElementById('latitude');
+            const longitude = document.getElementById('longitude');
+            const famousBox = document.getElementById('famousBox');
+            const famousText = document.getElementById('famousText');
+            const neighborsSection = document.getElementById('neighborsSection');
+            const neighborsList = document.getElementById('neighborsList');
+            const toast = document.getElementById('toast');
+
+            // === HELPERS ===
+            function showToast(msg, type = 'info') {
+                toast.textContent = msg;
+                toast.className = 'toast show ' + type;
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => {
+                    toast.className = 'toast';
+                }, 3000);
+            }
+
+            function setLoading(loading) {
+                isLoading = loading;
+                if (loading) {
+                    loadingState.classList.add('show');
+                    checkBtn.disabled = true;
+                    checkBtn.textContent = 'PROSES...';
+                } else {
+                    loadingState.classList.remove('show');
+                    checkBtn.disabled = false;
+                    checkBtn.textContent = 'CEK NEGARA';
+                }
+            }
+
+            function showError(msg) {
+                errorText.textContent = msg;
+                errorState.classList.add('show');
+            }
+
+            function hideError() {
+                errorState.classList.remove('show');
+            }
+
+            function hideAllResults() {
+                countryHeader.classList.remove('show');
+                infoGrid.classList.remove('show');
+                famousBox.classList.remove('show');
+                neighborsSection.classList.remove('show');
+            }
+
+            // === CHECK COUNTRY ===
+            window.checkCountry = function() {
+                const query = countryInput.value.trim();
+                if (!query) {
+                    showToast('Masukkan nama negara!', 'error');
+                    return;
+                }
+
+                hideError();
+                hideAllResults();
+                setLoading(true);
+
+                const url = API_URL + encodeURIComponent(query);
+
+                fetch(url)
+                    .then(res => res.json())
+                    .then(data => {
+                        setLoading(false);
+                        if (data.status === true && data.data) {
+                            renderCountry(data.data);
+                        } else {
+                            showError('Negara tidak ditemukan');
+                        }
+                    })
+                    .catch(err => {
+                        setLoading(false);
+                        showError('Gagal mengambil data: ' + err.message);
+                        showToast('Error: ' + err.message, 'error');
+                    });
+            };
+
+            // === RENDER COUNTRY ===
+            function renderCountry(data) {
+                // Header
+                const flagUrl = data.flag || null;
+                if (flagUrl) {
+                    flagContainer.innerHTML = `<img src="${flagUrl}" alt="Flag" />`;
+                } else {
+                    flagContainer.innerHTML = `<i class="fas fa-flag"></i>`;
+                }
+                countryName.textContent = data.name || '-';
+                capitalText.textContent = data.capital || '-';
+                continentText.textContent = data.continent?.name || '-';
+                countryHeader.classList.add('show');
+
+                // Info Grid
+                phoneCode.textContent = data.phoneCode || '-';
+                area.textContent = data.area?.squareKilometers ? data.area.squareKilometers + ' km²' : '-';
+                const langs = data.languages?.native || [];
+                languages.textContent = langs.length > 0 ? langs.join(', ') : '-';
+                currency.textContent = data.currency || '-';
+                drivingSide.textContent = data.drivingSide || '-';
+                tld.textContent = data.internetTLD || '-';
+                latitude.textContent = data.coordinates?.latitude || '-';
+                longitude.textContent = data.coordinates?.longitude || '-';
+                infoGrid.classList.add('show');
+
+                // Famous For
+                if (data.famousFor) {
+                    famousText.textContent = data.famousFor;
+                    famousBox.classList.add('show');
+                } else {
+                    famousBox.classList.remove('show');
+                }
+
+                // Neighbors
+                const neighbors = data.neighbors || [];
+                if (neighbors.length > 0) {
+                    neighborsList.innerHTML = '';
+                    neighbors.forEach((neighbor) => {
+                        const div = document.createElement('div');
+                        div.className = 'neighbor-item';
+                        const flag = neighbor.flag || null;
+                        let flagHtml = '';
+                        if (flag) {
+                            flagHtml = `<img src="${flag}" alt="Flag" />`;
+                        } else {
+                            flagHtml = `<i class="fas fa-flag" style="font-size:16px;color:rgba(255,255,255,0.3);"></i>`;
+                        }
+                        const lat = neighbor.coordinates?.latitude || '-';
+                        const lng = neighbor.coordinates?.longitude || '-';
+                        div.innerHTML = `
+                            <div class="flag-sm">${flagHtml}</div>
+                            <div class="info">
+                                <div class="name">${neighbor.name || 'Unknown'}</div>
+                                <div class="coords">Lat: ${lat}, Long: ${lng}</div>
+                            </div>
+                        `;
+                        neighborsList.appendChild(div);
+                    });
+                    neighborsSection.classList.add('show');
+                } else {
+                    neighborsSection.classList.remove('show');
+                }
+
+                showToast('✅ Data negara ditemukan!', 'success');
+            }
+
+            // === ENTER KEY ===
+            countryInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    checkCountry();
+                }
+            });
+
+            // === INIT ===
+            function init() {
+                if (!sessionKey || !username) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+            }
+
+            init();
+
+        })();
+    </script>
+
+</body>
+</html>

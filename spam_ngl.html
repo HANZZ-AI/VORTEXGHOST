@@ -1,0 +1,220 @@
+<!-- spam_ngl.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NGL Spam - Vortex Ghost</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0D0221; color: #fff; font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh; background: linear-gradient(180deg, #0D0221 0%, #1A0533 50%, #0D0221 100%);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #7B1FA2; border-radius: 4px; }
+
+        .app-header {
+            display: flex; align-items: center; padding: 16px 20px;
+            background: rgba(13,2,33,0.95); border-bottom: 1px solid rgba(234,128,252,0.1);
+            position: sticky; top: 0; z-index: 10;
+        }
+        .app-header .back-btn {
+            background: none; border: none; color: #EA80FC; font-size: 20px;
+            cursor: pointer; padding: 4px; margin-right: 12px;
+        }
+        .app-header .title {
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px;
+            color: #fff; flex: 1; text-align: center;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 16px 20px; padding-bottom: 40px; }
+
+        .input-section {
+            background: rgba(255,255,255,0.05); border-radius: 20px; padding: 20px;
+            border: 1px solid rgba(123,31,162,0.2); margin-bottom: 16px;
+        }
+        .input-section .form-group { margin-bottom: 14px; }
+        .input-section .form-group:last-child { margin-bottom: 0; }
+        .input-section .form-group label {
+            display: block; font-size: 11px; color: rgba(255,255,255,0.5);
+            font-family: 'Orbitron', sans-serif; letter-spacing: 1px; margin-bottom: 4px;
+        }
+        .input-section .form-group input, .input-section .form-group textarea {
+            width: 100%; padding: 14px 16px; border-radius: 12px;
+            border: 1px solid rgba(123,31,162,0.3); background: rgba(255,255,255,0.05);
+            color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 14px;
+            outline: none; transition: border 0.2s;
+        }
+        .input-section .form-group input:focus, .input-section .form-group textarea:focus { border-color: #EA80FC; }
+        .input-section .form-group input::placeholder, .input-section .form-group textarea::placeholder { color: rgba(255,255,255,0.3); }
+        .input-section .form-group textarea { resize: vertical; min-height: 60px; }
+
+        .btn-row { display: flex; gap: 10px; margin-bottom: 16px; }
+        .btn-row button {
+            flex: 1; padding: 14px; border: none; border-radius: 12px;
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-row .btn-start { background: linear-gradient(135deg, #7B1FA2, #EA80FC); color: #fff; }
+        .btn-row .btn-start:hover { transform: scale(1.02); }
+        .btn-row .btn-start:disabled { opacity: 0.6; cursor: not-allowed; transform: scale(1); }
+        .btn-row .btn-stop { background: rgba(255,0,0,0.1); color: #ff6b6b; border: 1px solid rgba(255,0,0,0.2); }
+        .btn-row .btn-stop:hover { background: rgba(255,0,0,0.2); }
+        .btn-row .btn-stop:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .status-box {
+            background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px;
+            border: 1px solid rgba(123,31,162,0.2); min-height: 120px;
+        }
+        .status-box .header {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+        }
+        .status-box .header i { color: #EA80FC; font-size: 18px; }
+        .status-box .header h4 { font-family: 'Orbitron', sans-serif; font-size: 14px; color: #EA80FC; }
+        .status-box .log {
+            color: rgba(255,255,255,0.7); font-size: 14px; min-height: 40px;
+            font-family: 'Share Tech Mono', monospace; line-height: 1.6;
+            word-break: break-all;
+        }
+        .status-box .log .counter {
+            color: #EA80FC; font-weight: 700; font-size: 20px;
+        }
+        .status-box .log .success { color: #4CAF50; }
+        .status-box .log .error { color: #ff6b6b; }
+        .status-box .log .info { color: #EA80FC; }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            max-width: 500px; width: calc(100% - 32px); padding: 14px 20px;
+            border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 2000;
+            display: none; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            animation: slideUp 0.3s ease;
+        }
+        .toast.show { display: block; }
+        .toast.success { background: rgba(76,175,80,0.9); color: #fff; }
+        .toast.error { background: rgba(255,0,0,0.85); color: #fff; }
+        .toast.info { background: rgba(123,31,162,0.9); color: #fff; }
+        @keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'"><i class="fas fa-arrow-left"></i></button>
+        <span class="title">NGL SPAM</span>
+        <div style="width:36px;"></div>
+    </header>
+    <div class="container">
+        <div class="input-section">
+            <div class="form-group">
+                <label>USERNAME NGL</label>
+                <input type="text" id="nglUsername" placeholder="contoh: username_ngl" />
+            </div>
+            <div class="form-group">
+                <label>PESAN</label>
+                <textarea id="nglMessage" placeholder="Masukkan pesan yang ingin dikirim..."></textarea>
+            </div>
+        </div>
+
+        <div class="btn-row">
+            <button class="btn-start" id="startBtn" onclick="startSpam()"><i class="fas fa-play"></i> START</button>
+            <button class="btn-stop" id="stopBtn" onclick="stopSpam()" disabled><i class="fas fa-stop"></i> STOP</button>
+        </div>
+
+        <div class="status-box">
+            <div class="header"><i class="fas fa-terminal"></i><h4>STATUS LOG</h4></div>
+            <div class="log" id="statusLog">Menunggu perintah...</div>
+        </div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const sessionKey = localStorage.getItem('sessionKey') || '';
+        const username = localStorage.getItem('username') || '';
+        let isRunning = false;
+        let timer = null;
+        let counter = 0;
+
+        function showToast(msg, type='info') {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.className = 'toast show ' + type;
+            clearTimeout(t._timer); t._timer = setTimeout(() => { t.className = 'toast'; }, 3000);
+        }
+
+        function updateLog(msg, type='info') {
+            const log = document.getElementById('statusLog');
+            const icons = { success: '✅', error: '❌', info: '⏳' };
+            log.innerHTML = `${icons[type] || ''} ${msg}`;
+            if (type === 'success') log.innerHTML = `<span class="success">✅ ${msg}</span>`;
+            else if (type === 'error') log.innerHTML = `<span class="error">❌ ${msg}</span>`;
+            else log.innerHTML = `<span class="info">⏳ ${msg}</span>`;
+        }
+
+        function generateDeviceId() {
+            return Array.from({length: 42}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+        }
+
+        async function sendNglMessage(username, message) {
+            const deviceId = generateDeviceId();
+            const url = 'https://ngl.link/api/submit';
+            const body = `username=${encodeURIComponent(username)}&question=${encodeURIComponent(message)}&deviceId=${deviceId}&gameSlug=&referrer=`;
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Referer': `https://ngl.link/${username}`,
+                        'Origin': 'https://ngl.link'
+                    },
+                    body: body
+                });
+                if (res.status === 200) {
+                    counter++;
+                    updateLog(`Pesan terkirim (${counter})`, 'success');
+                } else {
+                    updateLog(`Ratelimit (${res.status}), tunggu 5 detik...`, 'error');
+                    await new Promise(r => setTimeout(r, 5000));
+                }
+            } catch (e) {
+                updateLog(`Error: ${e.message}`, 'error');
+                await new Promise(r => setTimeout(r, 2000));
+            }
+        }
+
+        window.startSpam = function() {
+            const uname = document.getElementById('nglUsername').value.trim();
+            const msg = document.getElementById('nglMessage').value.trim();
+            if (!uname || !msg) { showToast('Isi username & pesan!', 'error'); return; }
+            if (isRunning) return;
+
+            isRunning = true;
+            counter = 0;
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+            updateLog('Mulai mengirim...', 'info');
+
+            timer = setInterval(async () => {
+                if (!isRunning) return;
+                await sendNglMessage(uname, msg);
+            }, 2000);
+        };
+
+        window.stopSpam = function() {
+            isRunning = false;
+            if (timer) { clearInterval(timer); timer = null; }
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            updateLog(`Dihentikan. Total terkirim: ${counter}`, 'info');
+            showToast(`⏹️ Dihentikan. Total: ${counter}`, 'info');
+        };
+
+        if (!sessionKey || !username) window.location.href = 'login.html';
+    </script>
+</body>
+</html>

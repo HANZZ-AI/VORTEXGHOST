@@ -1,0 +1,454 @@
+<!-- profile.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - Vortex Ghost</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0D0221;
+            color: #fff;
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #7B1FA2;
+            border-radius: 4px;
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            background: transparent;
+            border-bottom: 1px solid rgba(234, 128, 252, 0.1);
+        }
+        .app-header .back-btn {
+            background: none;
+            border: none;
+            color: #EA80FC;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            margin-right: 12px;
+        }
+        .app-header .title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: #fff;
+            flex: 1;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 40px;
+        }
+
+        /* Avatar */
+        .avatar-section {
+            display: flex;
+            justify-content: center;
+            margin: 16px 0 24px 0;
+        }
+        .avatar-wrapper {
+            position: relative;
+            cursor: pointer;
+            width: 120px;
+            height: 120px;
+        }
+        .avatar-wrapper .avatar-ring {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7B1FA2, #EA80FC);
+            padding: 3px;
+            box-shadow: 0 0 40px rgba(123, 31, 162, 0.5);
+        }
+        .avatar-wrapper .avatar-ring .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #1A0533;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.7);
+            overflow: hidden;
+        }
+        .avatar-wrapper .avatar-ring .avatar-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar-wrapper .camera-badge {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #EA80FC;
+            border: 2px solid #0D0221;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            box-shadow: 0 0 20px rgba(234, 128, 252, 0.4);
+        }
+
+        /* User Info */
+        .user-name {
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .user-role {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #EA80FC;
+            letter-spacing: 2px;
+            margin-top: 2px;
+        }
+
+        /* Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .info-grid .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .info-grid .info-card.full {
+            grid-column: 1 / -1;
+        }
+        .info-grid .info-card .label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .info-grid .info-card .label i {
+            color: #EA80FC;
+            font-size: 14px;
+        }
+        .info-grid .info-card .value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            font-family: 'Share Tech Mono', monospace;
+            word-break: break-all;
+        }
+
+        /* Change Password Button */
+        .btn-change-pass {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #7B1FA2, #EA80FC);
+            color: #fff;
+            box-shadow: 0 8px 30px rgba(123, 31, 162, 0.4);
+            transition: all 0.2s;
+            margin-top: 24px;
+            letter-spacing: 0.5px;
+        }
+        .btn-change-pass:hover {
+            transform: scale(1.02);
+        }
+        .btn-change-pass i {
+            margin-right: 8px;
+        }
+
+        /* Hidden file input */
+        #fileInput {
+            display: none;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 500px;
+            width: calc(100% - 32px);
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            animation: slideUp 0.3s ease;
+        }
+        .toast.show {
+            display: block;
+        }
+        .toast.success {
+            background: rgba(76, 175, 80, 0.9);
+            color: #fff;
+        }
+        .toast.error {
+            background: rgba(255, 0, 0, 0.85);
+            color: #fff;
+        }
+        .toast.info {
+            background: rgba(123, 31, 162, 0.9);
+            color: #fff;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @media (max-width: 400px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="app-header">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <span class="title">My Profile</span>
+        <div style="width:36px;"></div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="container" id="mainContainer">
+        <!-- Akan diisi oleh JavaScript -->
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ===== HIDDEN FILE INPUT ===== -->
+    <input type="file" id="fileInput" accept="image/*" />
+
+    <script>
+        // ============================================================
+        //  PROFILE - SAMA PERSIS DENGAN profile_page.dart
+        // ============================================================
+
+        (function() {
+            'use strict';
+
+            // === STATE ===
+            const username = localStorage.getItem('username') || 'User';
+            const password = localStorage.getItem('password') || '';
+            const role = localStorage.getItem('role') || 'member';
+            const expiredDate = localStorage.getItem('expiredDate') || 'N/A';
+            const sessionKey = localStorage.getItem('sessionKey') || '';
+
+            let profileImage = null; // base64 atau null
+
+            // === DOM REFS ===
+            const container = document.getElementById('mainContainer');
+            const toast = document.getElementById('toast');
+            const fileInput = document.getElementById('fileInput');
+
+            // === HELPERS ===
+            function showToast(msg, type = 'info') {
+                toast.textContent = msg;
+                toast.className = 'toast show ' + type;
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => {
+                    toast.className = 'toast';
+                }, 3000);
+            }
+
+            // === CENSOR TEXT (SAMA PERSIS DENGAN DART) ===
+            function censorText(text, isPassword = false) {
+                if (!text || text.length === 0) return 'N/A';
+                if (isPassword) return '••••••••';
+                if (text.length <= 2) return text.charAt(0) + '••';
+                return text.substring(0, 2) + '•'.repeat(text.length - 2);
+            }
+
+            // === LOAD PROFILE IMAGE FROM localStorage ===
+            function loadProfileImage() {
+                const saved = localStorage.getItem('profile_image_' + username);
+                if (saved) {
+                    profileImage = saved;
+                }
+            }
+
+            // === SAVE PROFILE IMAGE TO localStorage ===
+            function saveProfileImage(base64) {
+                localStorage.setItem('profile_image_' + username, base64);
+                profileImage = base64;
+            }
+
+            // === HANDLE FILE PICK ===
+            function handleFileSelect(file) {
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64 = e.target.result;
+                    saveProfileImage(base64);
+                    renderProfile();
+                    showToast('Profile image updated!', 'success');
+                };
+                reader.onerror = function() {
+                    showToast('Failed to load image', 'error');
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // === RENDER PROFILE ===
+            function renderProfile() {
+                const censoredUsername = censorText(username);
+                const censoredPassword = censorText(password, true);
+                const shortKey = sessionKey ? sessionKey.substring(0, 8) + '...' : 'N/A';
+
+                // Avatar
+                let avatarHTML = '';
+                if (profileImage) {
+                    avatarHTML = `<img src="${profileImage}" alt="Profile" />`;
+                } else {
+                    avatarHTML = `<i class="fas fa-user-astronaut"></i>`;
+                }
+
+                container.innerHTML = `
+                    <!-- Avatar -->
+                    <div class="avatar-section">
+                        <div class="avatar-wrapper" id="avatarWrapper">
+                            <div class="avatar-ring">
+                                <div class="avatar-img" id="avatarImg">
+                                    ${avatarHTML}
+                                </div>
+                            </div>
+                            <div class="camera-badge">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Info -->
+                    <div class="user-name">${username}</div>
+                    <div class="user-role">${role.toUpperCase()}</div>
+
+                    <!-- Info Grid -->
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <div class="label"><i class="fas fa-user"></i> Username</div>
+                            <div class="value">${censoredUsername}</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label"><i class="fas fa-lock"></i> Password</div>
+                            <div class="value">${censoredPassword}</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label"><i class="fas fa-shield-alt"></i> Role</div>
+                            <div class="value">${role.toUpperCase()}</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="label"><i class="fas fa-calendar-alt"></i> Expired</div>
+                            <div class="value">${expiredDate}</div>
+                        </div>
+                        <div class="info-card full">
+                            <div class="label"><i class="fas fa-key"></i> Session Key</div>
+                            <div class="value">${shortKey}</div>
+                        </div>
+                    </div>
+
+                    <!-- Change Password Button -->
+                    <button class="btn-change-pass" onclick="goToChangePassword()">
+                        <i class="fas fa-lock-reset"></i> CHANGE PASSWORD
+                    </button>
+                `;
+
+                // Re-attach click listener untuk avatar
+                const avatarWrapper = document.getElementById('avatarWrapper');
+                if (avatarWrapper) {
+                    avatarWrapper.addEventListener('click', function() {
+                        fileInput.click();
+                    });
+                }
+            }
+
+            // === NAVIGATE TO CHANGE PASSWORD ===
+            function goToChangePassword() {
+                window.location.href = 'change_password.html';
+            }
+
+            // === FILE INPUT HANDLER ===
+            fileInput.addEventListener('change', function(e) {
+                if (this.files && this.files.length > 0) {
+                    handleFileSelect(this.files[0]);
+                }
+                this.value = '';
+            });
+
+            // === INIT ===
+            function init() {
+                // Cek session
+                if (!sessionKey || !username) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                loadProfileImage();
+                renderProfile();
+            }
+
+            // === EXPOSE GLOBAL ===
+            window.goToChangePassword = goToChangePassword;
+
+            init();
+
+        })();
+    </script>
+
+</body>
+</html>

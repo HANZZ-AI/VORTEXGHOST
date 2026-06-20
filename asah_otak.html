@@ -1,0 +1,188 @@
+<!-- asah_otak.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asah Otak - Vortex Ghost</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0D0221; color: #fff; font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh; background: linear-gradient(180deg, #0D0221 0%, #1A0533 50%, #0D0221 100%);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #7B1FA2; border-radius: 4px; }
+
+        .app-header {
+            display: flex; align-items: center; padding: 16px 20px;
+            background: rgba(13,2,33,0.95); border-bottom: 1px solid rgba(234,128,252,0.1);
+            position: sticky; top: 0; z-index: 10;
+        }
+        .app-header .back-btn {
+            background: none; border: none; color: #EA80FC; font-size: 20px;
+            cursor: pointer; padding: 4px; margin-right: 12px;
+        }
+        .app-header .title {
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px;
+            color: #fff; flex: 1; text-align: center;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 16px 20px; padding-bottom: 40px; }
+
+        .question-card {
+            background: rgba(255,255,255,0.05); border-radius: 24px; padding: 30px 24px;
+            border: 1px solid rgba(123,31,162,0.2); text-align: center; margin-bottom: 20px;
+            min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .question-card .icon { font-size: 40px; color: #EA80FC; margin-bottom: 12px; }
+        .question-card .question {
+            font-size: 20px; font-weight: 600; color: #fff; line-height: 1.5;
+        }
+
+        .input-section {
+            display: flex; gap: 10px; margin-bottom: 16px;
+        }
+        .input-section input {
+            flex: 1; padding: 14px 16px; border-radius: 12px;
+            border: 1px solid rgba(123,31,162,0.3); background: rgba(255,255,255,0.05);
+            color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 14px;
+            outline: none; transition: border 0.2s;
+        }
+        .input-section input:focus { border-color: #EA80FC; }
+        .input-section input::placeholder { color: rgba(255,255,255,0.3); }
+        .input-section button {
+            padding: 14px 20px; border: none; border-radius: 12px;
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-fetch { background: linear-gradient(135deg, #7B1FA2, #EA80FC); color: #fff; }
+        .btn-fetch:hover { transform: scale(1.02); }
+        .btn-check { background: linear-gradient(135deg, #4CAF50, #45a049); color: #fff; }
+        .btn-check:hover { transform: scale(1.02); }
+        .btn-fetch:disabled, .btn-check:disabled { opacity: 0.6; cursor: not-allowed; transform: scale(1); }
+
+        .feedback {
+            padding: 12px 16px; border-radius: 12px; margin: 12px 0; display: none;
+            font-size: 14px; text-align: center;
+        }
+        .feedback.show { display: block; }
+        .feedback.correct { background: rgba(76,175,80,0.15); border: 1px solid #4CAF50; color: #4CAF50; }
+        .feedback.wrong { background: rgba(255,0,0,0.1); border: 1px solid #ff6b6b; color: #ff6b6b; }
+        .feedback.info { background: rgba(234,128,252,0.1); border: 1px solid #EA80FC; color: #EA80FC; }
+
+        .loading-state { text-align: center; padding: 20px 0; display: none; }
+        .loading-state.show { display: block; }
+        .loading-state .spinner {
+            width: 30px; height: 30px; margin: 0 auto;
+            border: 3px solid rgba(234,128,252,0.2); border-top: 3px solid #EA80FC;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            max-width: 500px; width: calc(100% - 32px); padding: 14px 20px;
+            border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 2000;
+            display: none; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            animation: slideUp 0.3s ease;
+        }
+        .toast.show { display: block; }
+        .toast.success { background: rgba(76,175,80,0.9); color: #fff; }
+        .toast.error { background: rgba(255,0,0,0.85); color: #fff; }
+        .toast.info { background: rgba(123,31,162,0.9); color: #fff; }
+        @keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'"><i class="fas fa-arrow-left"></i></button>
+        <span class="title">ASAH OTAK</span>
+        <div style="width:36px;"></div>
+    </header>
+    <div class="container">
+        <div class="question-card" id="questionCard">
+            <div class="icon"><i class="fas fa-brain"></i></div>
+            <div class="question" id="qText">Klik 'ASAH OTAK BEGO LU' untuk memulai</div>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <div class="input-section">
+            <input type="text" id="answerInput" placeholder="Masukkan jawaban..." />
+            <button class="btn-check" onclick="checkAnswer()"><i class="fas fa-check"></i> CEK</button>
+        </div>
+
+        <button class="btn-fetch" id="fetchBtn" onclick="fetchSoal()" style="width:100%;padding:16px;border:none;border-radius:12px;font-family:'Orbitron',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all 0.2s;background:linear-gradient(135deg,#7B1FA2,#EA80FC);color:#fff;">
+            <i class="fas fa-sync-alt"></i> ASAH OTAK BEGO LU
+        </button>
+
+        <div class="loading-state" id="loadingState"><div class="spinner"></div></div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = 'https://api.siputzx.my.id/api/games/asahotak';
+        const sessionKey = localStorage.getItem('sessionKey') || '';
+        const username = localStorage.getItem('username') || '';
+        let currentSoal = '';
+        let currentJawaban = '';
+
+        function showToast(msg, type='info') {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.className = 'toast show ' + type;
+            clearTimeout(t._timer); t._timer = setTimeout(() => { t.className = 'toast'; }, 3000);
+        }
+
+        function setLoading(loading) {
+            const loader = document.getElementById('loadingState');
+            const btn = document.getElementById('fetchBtn');
+            if (loading) { loader.classList.add('show'); btn.disabled = true; }
+            else { loader.classList.remove('show'); btn.disabled = false; }
+        }
+
+        function fetchSoal() {
+            setLoading(true);
+            document.getElementById('feedback').classList.remove('show');
+            document.getElementById('answerInput').value = '';
+            fetch(API_BASE)
+                .then(res => res.json())
+                .then(data => {
+                    setLoading(false);
+                    if (data.status && data.data) {
+                        currentSoal = data.data.soal;
+                        currentJawaban = data.data.jawaban.toLowerCase();
+                        document.getElementById('qText').textContent = currentSoal;
+                    } else {
+                        showToast('Gagal mengambil soal', 'error');
+                    }
+                })
+                .catch(() => {
+                    setLoading(false);
+                    showToast('Error: Gagal terhubung ke server', 'error');
+                });
+        }
+
+        function checkAnswer() {
+            if (!currentSoal) { showToast('Ambil soal dulu!', 'error'); return; }
+            const input = document.getElementById('answerInput').value.trim().toLowerCase();
+            if (!input) { showToast('Isi jawaban dulu!', 'error'); return; }
+            const feedback = document.getElementById('feedback');
+            if (input === currentJawaban) {
+                feedback.textContent = '✅ OTAK LU ENAK! Jawaban benar!';
+                feedback.className = 'feedback show correct';
+            } else {
+                feedback.textContent = '❌ OTAK LU BEGO! Jawaban salah!';
+                feedback.className = 'feedback show wrong';
+            }
+        }
+
+        document.getElementById('answerInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') checkAnswer(); });
+
+        if (!sessionKey || !username) window.location.href = 'login.html';
+    </script>
+</body>
+</html>
